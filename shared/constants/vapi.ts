@@ -1,1 +1,0 @@
-export const VAPI_PROVIDERS = ["VAPI", "N8N"] as const;

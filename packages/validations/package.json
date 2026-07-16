@@ -1,0 +1,12 @@
+{
+  "name": "@novadent/validations",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "dependencies": {
+    "@novadent/types": "*",
+    "@novadent/utils": "*",
+    "zod": "^4.4.3"
+  }
+}

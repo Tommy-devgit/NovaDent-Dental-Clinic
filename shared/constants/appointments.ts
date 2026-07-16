@@ -1,8 +1,0 @@
-export const APPOINTMENT_STATUSES = [
-  "SCHEDULED",
-  "CONFIRMED",
-  "RESCHEDULED",
-  "COMPLETED",
-  "CANCELLED",
-  "NO_SHOW",
-] as const;

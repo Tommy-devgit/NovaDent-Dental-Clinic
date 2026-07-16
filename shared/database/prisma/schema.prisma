@@ -6,31 +6,166 @@ datasource db {
   provider = "postgresql"
 }
 
-enum UserRole {
+enum StaffRole {
   ADMIN
-  STAFF
-  PATIENT
+  RECEPTIONIST
 }
 
-enum UserStatus {
+enum StaffStatus {
   ACTIVE
   INVITED
   SUSPENDED
 }
 
-model User {
-  id              String      @id @default(cuid())
-  role            UserRole    @default(PATIENT)
-  status          UserStatus  @default(INVITED)
-  email           String      @unique
-  name            String?
-  phone           String?
-  passwordHash    String?
-  emailVerifiedAt DateTime?
-  lastLoginAt     DateTime?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+enum LeadStatus {
+  NEW
+  CONTACTED
+  BOOKED
+  COMPLETED
+  CLOSED
+}
 
+enum LeadUrgency {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  RESCHEDULED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum ConversationProvider {
+  VAPI
+  N8N
+}
+
+model StaffUser {
+  id                   String            @id @default(cuid())
+  email                String            @unique
+  passwordHash         String
+  firstName            String
+  lastName             String
+  role                 StaffRole         @default(RECEPTIONIST)
+  status               StaffStatus       @default(INVITED)
+  lastLoginAt          DateTime?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  assignedLeads        PatientLead[]     @relation("LeadAssignee")
+  updatedLeads         PatientLead[]     @relation("LeadUpdater")
+  createdAppointments  Appointment[]     @relation("AppointmentCreator")
+  updatedAppointments  Appointment[]     @relation("AppointmentUpdater")
+  updatedSettings      ClinicSetting[]   @relation("SettingsUpdater")
+
+  @@map("staff_users")
   @@index([role])
   @@index([status])
+  @@index([email])
+}
+
+model PatientLead {
+  id                     String            @id @default(cuid())
+  patientName            String
+  phone                  String
+  email                  String?
+  reasonForVisit         String
+  symptoms               String?
+  urgency                LeadUrgency       @default(LOW)
+  status                 LeadStatus        @default(NEW)
+  conversationSummary    String?
+  transcript             String?
+  source                 String            @default("vapi")
+  vapiConversationId     String?           @unique
+  n8nExecutionId         String?
+  appointmentRequestedAt DateTime?
+  assignedStaffUserId    String?
+  updatedByStaffUserId   String?
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+
+  assignedStaffUser      StaffUser?        @relation("LeadAssignee", fields: [assignedStaffUserId], references: [id], onDelete: SetNull)
+  updatedByStaffUser     StaffUser?        @relation("LeadUpdater", fields: [updatedByStaffUserId], references: [id], onDelete: SetNull)
+  appointments           Appointment[]
+  conversationLogs       ConversationLog[]
+
+  @@map("patient_leads")
+  @@index([status])
+  @@index([urgency])
+  @@index([phone])
+  @@index([email])
+  @@index([createdAt])
+}
+
+model Appointment {
+  id                      String            @id @default(cuid())
+  leadId                  String
+  scheduledFor            DateTime
+  durationMinutes         Int               @default(30)
+  status                  AppointmentStatus @default(SCHEDULED)
+  notes                   String?
+  location                String?
+  externalCalendarEventId String?           @unique
+  cancelledAt             DateTime?
+  completedAt             DateTime?
+  createdByStaffUserId    String?
+  updatedByStaffUserId    String?
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+
+  lead                    PatientLead       @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  createdByStaffUser      StaffUser?        @relation("AppointmentCreator", fields: [createdByStaffUserId], references: [id], onDelete: SetNull)
+  updatedByStaffUser      StaffUser?        @relation("AppointmentUpdater", fields: [updatedByStaffUserId], references: [id], onDelete: SetNull)
+
+  @@map("appointments")
+  @@index([leadId])
+  @@index([status])
+  @@index([scheduledFor])
+}
+
+model ConversationLog {
+  id                      String              @id @default(cuid())
+  leadId                  String
+  provider                ConversationProvider @default(VAPI)
+  externalConversationId  String              @unique
+  summary                 String?
+  transcript              String
+  metadata                Json?
+  startedAt               DateTime?
+  endedAt                 DateTime?
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+
+  lead                    PatientLead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@map("conversation_logs")
+  @@index([leadId])
+  @@index([provider])
+  @@index([startedAt])
+}
+
+model ClinicSetting {
+  id                     String    @id @default(cuid())
+  slug                   String    @unique @default("default")
+  clinicName             String
+  address                String
+  phone                  String
+  email                  String
+  timezone               String    @default("UTC")
+  workingHours           Json
+  vapiConfig             Json
+  notificationSettings    Json
+  updatedByStaffUserId   String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  updatedByStaffUser     StaffUser? @relation("SettingsUpdater", fields: [updatedByStaffUserId], references: [id], onDelete: SetNull)
+
+  @@map("clinic_settings")
 }

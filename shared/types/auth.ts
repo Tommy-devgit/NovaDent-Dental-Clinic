@@ -1,13 +1,14 @@
-import { AUTH_USER_ROLES, AUTH_USER_STATUSES } from "../constants/auth";
+import { STAFF_ROLES, STAFF_STATUSES } from "../constants/auth";
 
-export type AuthUserRole = (typeof AUTH_USER_ROLES)[number];
+export type StaffRole = (typeof STAFF_ROLES)[number];
 
-export type AuthUserStatus = (typeof AUTH_USER_STATUSES)[number];
+export type StaffStatus = (typeof STAFF_STATUSES)[number];
 
-export interface AuthenticatedUser {
+export interface AuthenticatedStaffUser {
   id: string;
-  role: AuthUserRole;
-  status: AuthUserStatus;
+  role: StaffRole;
+  status: StaffStatus;
   email: string;
-  name?: string | null;
+  firstName: string;
+  lastName: string;
 }

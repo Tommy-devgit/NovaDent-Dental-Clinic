@@ -1,9 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 
-import { getRequiredEnvVar } from "../utils/env";
-
-getRequiredEnvVar("DATABASE_URL");
-
 const globalForPrisma = globalThis as typeof globalThis & {
   prisma?: PrismaClient;
 };

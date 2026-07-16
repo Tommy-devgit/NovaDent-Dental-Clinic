@@ -1,1 +1,1 @@
-# Meridian-Clinic
+# NovaDent

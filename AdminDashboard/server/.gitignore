@@ -1,0 +1,8 @@
+# environment files
+.env*
+
+# local artifacts
+node_modules/
+coverage/
+dist/
+*.log

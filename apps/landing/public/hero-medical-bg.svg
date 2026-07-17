@@ -1,0 +1,87 @@
+<svg width="1920" height="1280" viewBox="0 0 1920 1280" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg-wash" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f5f9ff" />
+      <stop offset="45%" stop-color="#eff6ff" />
+      <stop offset="100%" stop-color="#e0f2fe" />
+    </linearGradient>
+
+    <radialGradient id="bloom-primary" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.16" />
+      <stop offset="100%" stop-color="#2563eb" stop-opacity="0" />
+    </radialGradient>
+
+    <radialGradient id="bloom-accent" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0" />
+    </radialGradient>
+
+    <pattern id="dot-grid" width="36" height="36" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.6" fill="#2563eb" fill-opacity="0.10" />
+    </pattern>
+
+    <pattern id="cross-grid" width="220" height="220" patternUnits="userSpaceOnUse">
+      <g stroke="#2563eb" stroke-opacity="0.055" stroke-width="6" stroke-linecap="round">
+        <path d="M 110 82 L 110 138" />
+        <path d="M 82 110 L 138 110" />
+      </g>
+    </pattern>
+  </defs>
+
+  <rect width="1920" height="1280" fill="url(#bg-wash)" />
+  <rect width="1920" height="1280" fill="url(#dot-grid)" />
+  <rect width="1920" height="1280" fill="url(#cross-grid)" />
+
+  <circle cx="260" cy="220" r="480" fill="url(#bloom-primary)" />
+  <circle cx="1680" cy="1040" r="560" fill="url(#bloom-accent)" />
+  <circle cx="1550" cy="180" r="340" fill="url(#bloom-accent)" />
+
+  <!-- faint tooth silhouette watermark, right side -->
+  <g transform="translate(1420,300)" opacity="0.07">
+    <path
+      d="M180 0
+         C 260 0 320 55 322 130
+         C 324 210 300 300 288 400
+         C 280 470 262 560 226 560
+         C 190 560 180 470 168 400
+         C 160 350 150 320 130 320
+         C 110 320 100 350 92 400
+         C 80 470 70 560 34 560
+         C -2 560 -20 470 -28 400
+         C -40 300 -64 210 -62 130
+         C -60 55 0 0 80 0
+         Z"
+      fill="#0f172a"
+    />
+  </g>
+
+  <!-- EKG / vitals pulse line -->
+  <path
+    d="M -40 860
+       L 260 860
+       L 320 860
+       L 360 760
+       L 410 980
+       L 460 700
+       L 510 860
+       L 620 860
+       L 680 800
+       L 730 920
+       L 780 860
+       L 1960 860"
+    fill="none"
+    stroke="#2563eb"
+    stroke-opacity="0.14"
+    stroke-width="5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <g fill="#0ea5e9" fill-opacity="0.16">
+    <circle cx="420" cy="980" r="7" />
+    <circle cx="980" cy="360" r="5" />
+    <circle cx="1240" cy="980" r="6" />
+    <circle cx="1740" cy="420" r="8" />
+    <circle cx="150" cy="640" r="5" />
+  </g>
+</svg>

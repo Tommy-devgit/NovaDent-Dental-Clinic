@@ -11,9 +11,10 @@ import {
   Users,
 } from "lucide-react";
 
-import { appointmentsRepository, dashboardRepository, patientLeadsRepository } from "@novadent/database";
+import { activityLogsRepository, appointmentsRepository, dashboardRepository, patientLeadsRepository } from "@novadent/database";
 import { MetricCard, PageHeader } from "@novadent/ui";
 
+import { RecentActivityFeed } from "@/components/dashboard/recent-activity-feed";
 import { RecentLeadsTable } from "@/components/dashboard/recent-leads-table";
 import { UpcomingAppointments } from "@/components/dashboard/upcoming-appointments";
 
@@ -25,10 +26,11 @@ function formatDuration(seconds: number) {
 }
 
 export default async function DashboardPage() {
-  const [metrics, recentLeads, upcomingAppointments] = await Promise.all([
+  const [metrics, recentLeads, upcomingAppointments, recentActivity] = await Promise.all([
     dashboardRepository.getOverviewMetrics(),
     patientLeadsRepository.listLeads({ page: 1, pageSize: 5 }),
     appointmentsRepository.listUpcomingAppointments(5),
+    activityLogsRepository.listRecentActivity(8),
   ]);
 
   return (
@@ -91,15 +93,27 @@ export default async function DashboardPage() {
             createdAt: lead.createdAt,
           }))}
         />
-        <UpcomingAppointments
-          appointments={upcomingAppointments.map((appointment) => ({
-            id: appointment.id,
-            scheduledFor: appointment.scheduledFor,
-            durationMinutes: appointment.durationMinutes,
-            status: appointment.status,
-            lead: { id: appointment.lead.id, patientName: appointment.lead.patientName },
-          }))}
-        />
+        <div className="space-y-6">
+          <UpcomingAppointments
+            appointments={upcomingAppointments.map((appointment) => ({
+              id: appointment.id,
+              scheduledFor: appointment.scheduledFor,
+              durationMinutes: appointment.durationMinutes,
+              status: appointment.status,
+              lead: { id: appointment.lead.id, patientName: appointment.lead.patientName },
+            }))}
+          />
+          <RecentActivityFeed
+            activity={recentActivity.map((entry) => ({
+              id: entry.id,
+              action: entry.action,
+              createdAt: entry.createdAt,
+              staffUser: entry.staffUser
+                ? { firstName: entry.staffUser.firstName, lastName: entry.staffUser.lastName }
+                : null,
+            }))}
+          />
+        </div>
       </div>
     </div>
   );

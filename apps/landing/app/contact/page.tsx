@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { ContactSection } from "@/components/sections/contact-section";
 import { FaqSection } from "@/components/sections/faq-section";
+import { NewPatientSection } from "@/components/sections/new-patient-section";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -26,6 +27,7 @@ export default function ContactPage() {
       </section>
 
       <ContactSection />
+      <NewPatientSection />
       <FaqSection />
     </MarketingShell>
   );

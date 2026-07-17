@@ -3,6 +3,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
+import { AppointmentBookingModal } from "@/components/booking/appointment-booking-modal";
+import { ChatWidget } from "@/components/vapi/chat-widget";
+import { VapiAssistantProvider } from "@/components/vapi/vapi-assistant-provider";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -43,7 +47,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-background text-foreground">
-        <Providers>{children}</Providers>
+        <Providers>
+          <VapiAssistantProvider>
+            {children}
+            <ChatWidget />
+            <AppointmentBookingModal />
+          </VapiAssistantProvider>
+        </Providers>
       </body>
     </html>
   );

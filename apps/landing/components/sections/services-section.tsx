@@ -2,7 +2,7 @@
 
 import { Sparkle, Droplets, Hammer, AlignCenter, Anchor, Siren, Gem } from "lucide-react";
 
-import { Button, Card, CardContent, CardDescription, CardTitle } from "@novadent/ui";
+import { Badge, Button, Card, CardContent, CardDescription, CardTitle } from "@novadent/ui";
 
 import { openAssistant } from "@/lib/assistant-events";
 
@@ -11,36 +11,50 @@ const SERVICES = [
     icon: Droplets,
     name: "Teeth Cleaning",
     description: "Routine hygiene visits that catch problems early and keep your smile healthy.",
+    duration: "45 min visit",
+    cadence: "Every 6 months",
   },
   {
     icon: Sparkle,
     name: "Teeth Whitening",
     description: "Professional-grade whitening for noticeably brighter results in a single visit.",
+    duration: "60–90 min visit",
+    cadence: "In-office or take-home kit",
   },
   {
     icon: Hammer,
     name: "Fillings",
     description: "Comfortable, tooth-colored fillings that restore strength without the stares.",
+    duration: "30–45 min visit",
+    cadence: "Same-week scheduling",
   },
   {
     icon: AlignCenter,
-    name: "Braces",
+    name: "Braces & Aligners",
     description: "Modern orthodontic options for kids and adults, mapped out from day one.",
+    duration: "12–24 month plans",
+    cadence: "Free consult first",
   },
   {
     icon: Anchor,
     name: "Implants",
     description: "Permanent, natural-feeling replacements backed by careful surgical planning.",
+    duration: "3–6 month process",
+    cadence: "3D imaging included",
   },
   {
     icon: Siren,
     name: "Emergency Dental Care",
     description: "Same-day triage for sudden pain, breaks, or swelling — talk to us any time.",
+    duration: "Seen within hours",
+    cadence: "Available 7 days a week",
   },
   {
     icon: Gem,
     name: "Cosmetic Dentistry",
     description: "Veneers, bonding, and smile design tailored to how you want to look and feel.",
+    duration: "1–3 visits",
+    cadence: "Digital smile preview",
   },
 ];
 
@@ -71,6 +85,10 @@ export function ServicesSection() {
                 </span>
                 <CardTitle className="mt-4">{service.name}</CardTitle>
                 <CardDescription className="mt-2 leading-6">{service.description}</CardDescription>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Badge variant="secondary">{service.duration}</Badge>
+                  <Badge variant="outline">{service.cadence}</Badge>
+                </div>
               </CardContent>
             </Card>
           ))}

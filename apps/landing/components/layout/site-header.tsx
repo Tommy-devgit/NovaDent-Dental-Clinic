@@ -15,6 +15,7 @@ import {
 } from "@novadent/ui";
 
 import { openAssistant } from "@/lib/assistant-events";
+import { openBooking } from "@/lib/booking-events";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -48,11 +49,11 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/contact">Book Appointment</Link>
+          <Button variant="outline" size="sm" onClick={() => openBooking()}>
+            Book Appointment
           </Button>
           <Button size="sm" onClick={openAssistant}>
-            Talk to NovaDent AI
+            Chat with NovaDent AI
           </Button>
         </div>
 
@@ -77,8 +78,14 @@ export function SiteHeader() {
             </nav>
             <div className="mt-auto flex flex-col gap-3">
               <SheetClose asChild>
-                <Button variant="outline" asChild>
-                  <Link href="/contact">Book Appointment</Link>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setOpen(false);
+                    openBooking();
+                  }}
+                >
+                  Book Appointment
                 </Button>
               </SheetClose>
               <SheetClose asChild>
@@ -88,7 +95,7 @@ export function SiteHeader() {
                     openAssistant();
                   }}
                 >
-                  Talk to NovaDent AI
+                  Chat with NovaDent AI
                 </Button>
               </SheetClose>
             </div>

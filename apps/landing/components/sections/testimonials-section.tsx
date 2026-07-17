@@ -17,6 +17,17 @@ const TESTIMONIALS = [
     name: "Priya K.",
     role: "Patient since 2024",
   },
+  {
+    quote:
+      "Dr. Reyes walked me through the whole implant timeline before I even sat in the chair, because the assistant had already logged my concerns.",
+    name: "Marcus T.",
+    role: "Patient since 2021",
+  },
+  {
+    quote: "Booked my daughter's orthodontics consult over text during my lunch break. Took maybe three minutes.",
+    name: "Elena V.",
+    role: "Patient since 2022",
+  },
 ];
 
 export function TestimonialsSection() {

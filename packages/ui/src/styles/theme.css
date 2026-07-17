@@ -89,6 +89,9 @@
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  --animate-voice-bar: voice-bar 1.1s ease-in-out infinite;
+  --animate-orb-pulse: orb-pulse 2.4s ease-in-out infinite;
 }
 
 @keyframes accordion-down {
@@ -106,6 +109,26 @@
   }
   to {
     height: 0;
+  }
+}
+
+@keyframes voice-bar {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes orb-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 25%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 18px color-mix(in srgb, var(--primary) 0%, transparent);
   }
 }
 

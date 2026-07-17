@@ -95,6 +95,7 @@ model PatientLead {
   email                  String?
   reasonForVisit         String
   symptoms               String?
+  isNewPatient           Boolean?
   urgency                LeadUrgency       @default(LOW)
   status                 LeadStatus        @default(NEW)
   conversationSummary    String?

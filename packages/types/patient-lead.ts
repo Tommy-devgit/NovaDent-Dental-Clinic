@@ -11,6 +11,7 @@ export interface PatientLeadRecord {
   email?: string | null;
   reasonForVisit: string;
   symptoms?: string | null;
+  isNewPatient?: boolean | null;
   urgency: LeadUrgency;
   status: LeadStatus;
   conversationSummary?: string | null;

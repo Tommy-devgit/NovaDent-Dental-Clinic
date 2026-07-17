@@ -4,7 +4,7 @@ const FAQS = [
   {
     question: "How does the AI assistant work?",
     answer:
-      "Tap “Talk to AI Assistant” and describe what's going on, by voice or chat. It asks a few follow-up questions to understand urgency and the right service, then hands the details straight to our front desk.",
+      "Open the assistant from the hero section to talk out loud, or use the Chat button in the corner of any page to type instead. Either way it asks a few follow-up questions to understand urgency and the right service, then hands the details straight to our front desk.",
   },
   {
     question: "Is my information kept private?",
@@ -25,6 +25,16 @@ const FAQS = [
     question: "Do you accept walk-ins for emergencies?",
     answer:
       "Emergency cases are prioritized — start a conversation with the AI assistant or call us directly and we'll do our best to fit you in same-day.",
+  },
+  {
+    question: "Do you treat children?",
+    answer:
+      "Yes — our general and orthodontic team see patients starting around age 6, and we schedule family visits back-to-back when possible.",
+  },
+  {
+    question: "What if I need to reschedule?",
+    answer:
+      "Just tell the assistant your appointment details and the new time you'd prefer, or call the front desk. We ask for at least 24 hours' notice when possible.",
   },
 ];
 

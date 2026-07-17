@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { HowItWorksSection } from "@/components/sections/how-it-works-section";
+import { InsuranceSection } from "@/components/sections/insurance-section";
 import { ServicesSection } from "@/components/sections/services-section";
 
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "Explore NovaDent's dental services, from routine cleanings to emergency care, cosmetic dentistry, and implants.",
+    "Explore NovaDent's dental services, from routine cleanings to emergency care, cosmetic dentistry, and implants — plus insurance and payment details.",
 };
 
 export default function ServicesPage() {
@@ -28,6 +29,7 @@ export default function ServicesPage() {
 
       <ServicesSection />
       <HowItWorksSection />
+      <InsuranceSection />
     </MarketingShell>
   );
 }

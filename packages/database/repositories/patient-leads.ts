@@ -124,6 +124,29 @@ export const patientLeadsRepository = {
     });
   },
 
+  createLeadFromBooking(payload: {
+    patientName: string;
+    phone: string;
+    email?: string;
+    reasonForVisit: string;
+    isNewPatient?: boolean;
+    notes?: string;
+    appointmentRequestedAt: Date;
+  }) {
+    return prisma.patientLead.create({
+      data: {
+        patientName: payload.patientName,
+        phone: payload.phone,
+        email: payload.email,
+        reasonForVisit: payload.reasonForVisit,
+        isNewPatient: payload.isNewPatient,
+        conversationSummary: payload.notes,
+        source: "website_booking",
+        appointmentRequestedAt: payload.appointmentRequestedAt,
+      },
+    });
+  },
+
   updateLeadStatus(id: string, status: string, updatedByStaffUserId?: string, note?: string) {
     return prisma.patientLead.update({
       where: { id },

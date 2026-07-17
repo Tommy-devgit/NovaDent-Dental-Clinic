@@ -5,7 +5,7 @@ const STEPS = [
     icon: MessageCircle,
     step: "1",
     title: "Start a conversation",
-    description: "Tap “Talk to AI Assistant” and describe what's going on in your own words, by voice or chat.",
+    description: "Talk out loud with the assistant on our homepage, or type to it from the Chat button on any page.",
   },
   {
     icon: Stethoscope,

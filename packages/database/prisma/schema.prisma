@@ -47,6 +47,22 @@ enum ConversationProvider {
   N8N
 }
 
+enum ConversationStatus {
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum ActivityAction {
+  LEAD_CREATED
+  LEAD_UPDATED
+  CONVERSATION_STARTED
+  CONVERSATION_ENDED
+  APPOINTMENT_CREATED
+  APPOINTMENT_UPDATED
+  STATUS_CHANGED
+}
+
 model StaffUser {
   id                   String            @id @default(cuid())
   email                String            @unique
@@ -64,6 +80,7 @@ model StaffUser {
   createdAppointments  Appointment[]     @relation("AppointmentCreator")
   updatedAppointments  Appointment[]     @relation("AppointmentUpdater")
   updatedSettings      ClinicSetting[]   @relation("SettingsUpdater")
+  activityLogs         ActivityLog[]
 
   @@map("staff_users")
   @@index([role])
@@ -135,6 +152,9 @@ model ConversationLog {
   leadId                  String
   provider                ConversationProvider @default(VAPI)
   externalConversationId  String              @unique
+  assistantId             String?
+  status                  ConversationStatus  @default(COMPLETED)
+  durationSeconds         Int?
   summary                 String?
   transcript              String
   metadata                Json?
@@ -149,6 +169,24 @@ model ConversationLog {
   @@index([leadId])
   @@index([provider])
   @@index([startedAt])
+  @@index([status])
+}
+
+model ActivityLog {
+  id           String         @id @default(cuid())
+  action       ActivityAction
+  resourceType String
+  resourceId   String
+  staffUserId  String?
+  metadata     Json?
+  createdAt    DateTime       @default(now())
+
+  staffUser    StaffUser?     @relation(fields: [staffUserId], references: [id], onDelete: SetNull)
+
+  @@map("activity_logs")
+  @@index([resourceType, resourceId])
+  @@index([action])
+  @@index([createdAt])
 }
 
 model ClinicSetting {

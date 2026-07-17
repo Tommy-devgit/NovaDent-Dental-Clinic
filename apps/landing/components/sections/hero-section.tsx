@@ -1,7 +1,11 @@
+"use client";
+
 import { CalendarCheck, ShieldCheck, Sparkles, Stethoscope } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@novadent/ui";
+
+import { openAssistant } from "@/lib/assistant-events";
 
 const TRUST_INDICATORS = [
   { icon: ShieldCheck, label: "HIPAA-conscious intake" },
@@ -34,8 +38,8 @@ export function HeroSection() {
           </p>
 
           <div className="mt-10 flex flex-wrap gap-3">
-            <Button size="lg" asChild>
-              <Link href="#ai-assistant">Talk to AI Assistant</Link>
+            <Button size="lg" onClick={openAssistant}>
+              Talk to NovaDent AI
             </Button>
             <Button size="lg" variant="outline" asChild>
               <Link href="/contact">Book Appointment</Link>

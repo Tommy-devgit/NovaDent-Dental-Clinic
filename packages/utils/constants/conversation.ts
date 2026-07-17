@@ -1,0 +1,1 @@
+export const CONVERSATION_STATUSES = ["IN_PROGRESS", "COMPLETED", "FAILED"] as const;

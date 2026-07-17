@@ -14,6 +14,8 @@ import {
   SheetTrigger,
 } from "@novadent/ui";
 
+import { openAssistant } from "@/lib/assistant-events";
+
 const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/services", label: "Services" },
@@ -49,8 +51,8 @@ export function SiteHeader() {
           <Button variant="outline" size="sm" asChild>
             <Link href="/contact">Book Appointment</Link>
           </Button>
-          <Button size="sm" asChild>
-            <Link href="#ai-assistant">Talk to AI Assistant</Link>
+          <Button size="sm" onClick={openAssistant}>
+            Talk to NovaDent AI
           </Button>
         </div>
 
@@ -80,8 +82,13 @@ export function SiteHeader() {
                 </Button>
               </SheetClose>
               <SheetClose asChild>
-                <Button asChild>
-                  <Link href="#ai-assistant">Talk to AI Assistant</Link>
+                <Button
+                  onClick={() => {
+                    setOpen(false);
+                    openAssistant();
+                  }}
+                >
+                  Talk to NovaDent AI
                 </Button>
               </SheetClose>
             </div>

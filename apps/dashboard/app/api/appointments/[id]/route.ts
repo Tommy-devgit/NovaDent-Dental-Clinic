@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { appointmentsRepository } from "@novadent/database";
+import { activityLogsRepository, appointmentsRepository } from "@novadent/database";
 import { appointmentStatusUpdateSchema } from "@novadent/validations";
 
 import { getStaffSessionFromCookies } from "@/lib/session";
@@ -16,5 +16,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   const session = await getStaffSessionFromCookies();
   const appointment = await appointmentsRepository.updateAppointmentStatus(id, parsed.data.status, session?.id);
+
+  await activityLogsRepository
+    .logActivity({
+      action: "APPOINTMENT_UPDATED",
+      resourceType: "Appointment",
+      resourceId: id,
+      staffUserId: session?.id,
+      metadata: { status: parsed.data.status },
+    })
+    .catch(() => undefined);
+
   return NextResponse.json({ appointment });
 }

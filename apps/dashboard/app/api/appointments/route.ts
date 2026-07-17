@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { appointmentsRepository } from "@novadent/database";
+import { activityLogsRepository, appointmentsRepository } from "@novadent/database";
 import { appointmentUpsertSchema } from "@novadent/validations";
 
 import { getStaffSessionFromCookies } from "@/lib/session";
@@ -23,5 +23,16 @@ export async function POST(request: Request) {
     ...parsed.data,
     createdByStaffUserId: session?.id,
   });
+
+  await activityLogsRepository
+    .logActivity({
+      action: "APPOINTMENT_CREATED",
+      resourceType: "Appointment",
+      resourceId: appointment.id,
+      staffUserId: session?.id,
+      metadata: { leadId: appointment.leadId, scheduledFor: appointment.scheduledFor },
+    })
+    .catch(() => undefined);
+
   return NextResponse.json({ appointment }, { status: 201 });
 }

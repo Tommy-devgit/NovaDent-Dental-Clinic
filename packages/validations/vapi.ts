@@ -1,11 +1,14 @@
 import { z } from "zod";
 
-import { LEAD_URGENCIES, VAPI_PROVIDERS } from "@novadent/utils";
+import { CONVERSATION_STATUSES, LEAD_URGENCIES, VAPI_PROVIDERS } from "@novadent/utils";
 
 export const vapiIntakeWebhookSchema = z.object({
   externalConversationId: z.string().min(1),
+  assistantId: z.string().trim().optional(),
   n8nExecutionId: z.string().trim().optional(),
   provider: z.enum(VAPI_PROVIDERS).default("VAPI"),
+  status: z.enum(CONVERSATION_STATUSES).default("COMPLETED"),
+  durationSeconds: z.coerce.number().int().min(0).optional(),
   patientName: z.string().trim().min(1),
   phone: z.string().trim().min(6),
   email: z.string().email().optional(),

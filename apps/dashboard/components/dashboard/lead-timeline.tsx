@@ -1,11 +1,11 @@
-import { CalendarCheck2, MessageCircle, UserPlus } from "lucide-react";
+import { CalendarCheck2, MessageCircle, RefreshCw, UserPlus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@novadent/ui";
 
 export interface TimelineEvent {
   id: string;
-  type: "lead-created" | "conversation" | "appointment";
+  type: "lead-created" | "conversation" | "appointment" | "status-change";
   label: string;
   timestamp: Date;
 }
@@ -14,6 +14,7 @@ const ICONS: Record<TimelineEvent["type"], LucideIcon> = {
   "lead-created": UserPlus,
   conversation: MessageCircle,
   appointment: CalendarCheck2,
+  "status-change": RefreshCw,
 };
 
 export function LeadTimeline({ events }: { events: TimelineEvent[] }) {

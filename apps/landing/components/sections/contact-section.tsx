@@ -1,7 +1,11 @@
+"use client";
+
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 
 import { Button, Card, CardContent } from "@novadent/ui";
+
+import { openAssistant } from "@/lib/assistant-events";
 
 const CONTACT_DETAILS = [
   { icon: Phone, label: "Phone", value: "(555) 123-4567", href: "tel:+15551234567" },
@@ -26,9 +30,7 @@ export function ContactSection() {
                 straight to our front desk.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Button asChild>
-                  <Link href="#ai-assistant">Talk to AI Assistant</Link>
-                </Button>
+                <Button onClick={openAssistant}>Book With AI Assistant</Button>
                 <Button variant="outline" asChild>
                   <Link href="tel:+15551234567">Call the clinic</Link>
                 </Button>

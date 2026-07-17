@@ -18,40 +18,56 @@ function buildLeadFilters(filters: { q?: string; status?: string; urgency?: stri
 }
 
 export const patientLeadsRepository = {
-  getOverviewMetrics() {
+  async getOverviewMetrics() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    return prisma.$transaction(async (transaction) => {
-      const [totalLeads, newLeads, contactedLeads, urgentCases, appointmentsToday, activeConversations] =
-        await Promise.all([
-          transaction.patientLead.count(),
-          transaction.patientLead.count({ where: { status: "NEW" } }),
-          transaction.patientLead.count({ where: { status: "CONTACTED" } }),
-          transaction.patientLead.count({ where: { urgency: { in: ["HIGH", "URGENT"] } } }),
-          transaction.appointment.count({
-            where: {
-              scheduledFor: {
-                gte: today,
-                lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
-              },
-              status: { in: ["SCHEDULED", "CONFIRMED", "RESCHEDULED"] },
-            },
-          }),
-          transaction.conversationLog.count({
-            where: { createdAt: { gte: today } },
-          }),
-        ]);
+    const [
+      totalLeads,
+      newLeads,
+      contactedLeads,
+      urgentCases,
+      appointmentsToday,
+      totalConversations,
+      todaysConversations,
+      appointmentRequests,
+      callDurationAggregate,
+    ] = await Promise.all([
+      prisma.patientLead.count(),
+      prisma.patientLead.count({ where: { status: "NEW" } }),
+      prisma.patientLead.count({ where: { status: "CONTACTED" } }),
+      prisma.patientLead.count({ where: { urgency: { in: ["HIGH", "URGENT"] } } }),
+      prisma.appointment.count({
+        where: {
+          scheduledFor: {
+            gte: today,
+            lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          },
+          status: { in: ["SCHEDULED", "CONFIRMED", "RESCHEDULED"] },
+        },
+      }),
+      prisma.conversationLog.count(),
+      prisma.conversationLog.count({
+        where: { createdAt: { gte: today } },
+      }),
+      prisma.patientLead.count({ where: { appointmentRequestedAt: { not: null } } }),
+      prisma.conversationLog.aggregate({
+        _avg: { durationSeconds: true },
+        where: { durationSeconds: { not: null } },
+      }),
+    ]);
 
-      return {
-        totalLeads,
-        newLeads,
-        contactedLeads,
-        urgentCases,
-        appointmentsToday,
-        activeConversations,
-      };
-    });
+    return {
+      totalLeads,
+      newLeads,
+      contactedLeads,
+      urgentCases,
+      appointmentsToday,
+      totalConversations,
+      todaysConversations,
+      appointmentRequests,
+      averageCallDurationSeconds: Math.round(callDurationAggregate._avg.durationSeconds ?? 0),
+    };
   },
 
   listLeadOptions(limit = 100) {
@@ -82,6 +98,10 @@ export const patientLeadsRepository = {
 
   countLeads(filters: { q?: string; status?: string; urgency?: string }) {
     return prisma.patientLead.count({ where: buildLeadFilters(filters) });
+  },
+
+  findByVapiConversationId(vapiConversationId: string) {
+    return prisma.patientLead.findUnique({ where: { vapiConversationId } });
   },
 
   getLeadById(id: string) {

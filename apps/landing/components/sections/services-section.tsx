@@ -1,6 +1,10 @@
+"use client";
+
 import { Sparkle, Droplets, Hammer, AlignCenter, Anchor, Siren, Gem } from "lucide-react";
 
-import { Card, CardContent, CardDescription, CardTitle } from "@novadent/ui";
+import { Button, Card, CardContent, CardDescription, CardTitle } from "@novadent/ui";
+
+import { openAssistant } from "@/lib/assistant-events";
 
 const SERVICES = [
   {
@@ -53,6 +57,9 @@ export function ServicesSection() {
             Tell the AI assistant what&apos;s going on and get routed to the right service — no guesswork, no waiting on
             hold.
           </p>
+          <Button className="mt-6" variant="outline" onClick={openAssistant}>
+            Ask About Dental Services
+          </Button>
         </div>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

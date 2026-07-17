@@ -1,3 +1,4 @@
+export * from "./activity-log";
 export * from "./appointment";
 export * from "./auth";
 export * from "./clinic-setting";

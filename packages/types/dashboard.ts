@@ -4,5 +4,8 @@ export interface DashboardOverviewMetrics {
   contactedLeads: number;
   appointmentsToday: number;
   urgentCases: number;
-  activeConversations: number;
+  totalConversations: number;
+  todaysConversations: number;
+  appointmentRequests: number;
+  averageCallDurationSeconds: number;
 }

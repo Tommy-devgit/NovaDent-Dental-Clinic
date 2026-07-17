@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { notFound } from "next/navigation";
 
-import { patientLeadsRepository } from "@novadent/database";
+import { activityLogsRepository, patientLeadsRepository } from "@novadent/database";
 import { Card, CardContent, CardHeader, CardTitle, PageHeader, StatusBadge } from "@novadent/ui";
 
 import { LeadStatusActions } from "@/components/dashboard/lead-status-actions";
@@ -11,7 +11,10 @@ import { LeadTimeline } from "@/components/dashboard/lead-timeline";
 
 export default async function LeadDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const lead = await patientLeadsRepository.getLeadById(id);
+  const [lead, activity] = await Promise.all([
+    patientLeadsRepository.getLeadById(id),
+    activityLogsRepository.listActivityForResource("PatientLead", id),
+  ]);
 
   if (!lead) {
     notFound();
@@ -22,7 +25,7 @@ export default async function LeadDetailsPage({ params }: { params: Promise<{ id
     ...lead.conversationLogs.map((log) => ({
       id: log.id,
       type: "conversation" as const,
-      label: `${log.provider} conversation logged`,
+      label: `${log.provider} conversation ${log.status === "IN_PROGRESS" ? "started" : "completed"}`,
       timestamp: log.createdAt,
     })),
     ...lead.appointments.map((appointment) => ({
@@ -31,6 +34,16 @@ export default async function LeadDetailsPage({ params }: { params: Promise<{ id
       label: `Appointment ${appointment.status.toLowerCase()} for ${appointment.scheduledFor.toLocaleDateString()}`,
       timestamp: appointment.createdAt,
     })),
+    ...activity
+      .filter((entry) => entry.action === "STATUS_CHANGED")
+      .map((entry) => ({
+        id: entry.id,
+        type: "status-change" as const,
+        label: entry.staffUser
+          ? `Status updated by ${entry.staffUser.firstName} ${entry.staffUser.lastName}`
+          : "Status updated",
+        timestamp: entry.createdAt,
+      })),
   ];
 
   return (

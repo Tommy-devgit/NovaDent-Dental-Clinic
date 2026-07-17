@@ -4,7 +4,7 @@ import { CalendarPlus, HelpCircle, ListChecks, MessagesSquare, Sparkles } from "
 
 import { Button } from "@novadent/ui";
 
-import { OPEN_ASSISTANT_EVENT } from "@/components/vapi/floating-assistant";
+import { openAssistant } from "@/lib/assistant-events";
 
 const CAPABILITIES = [
   { icon: HelpCircle, label: "Answers questions about care and treatment" },
@@ -35,7 +35,7 @@ export function AiAssistantSection() {
                 size="lg"
                 variant="secondary"
                 className="bg-white text-primary hover:bg-blue-50"
-                onClick={() => window.dispatchEvent(new Event(OPEN_ASSISTANT_EVENT))}
+                onClick={openAssistant}
               >
                 Start voice conversation
               </Button>

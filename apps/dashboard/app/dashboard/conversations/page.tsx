@@ -3,47 +3,102 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 
 import { conversationLogsRepository } from "@novadent/database";
-import { Card, CardContent, EmptyState, PageHeader, StatusBadge } from "@novadent/ui";
+import {
+  EmptyState,
+  PageHeader,
+  Pagination,
+  StatusBadge,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@novadent/ui";
+import { conversationFiltersSchema } from "@novadent/validations";
 
-export default async function ConversationsPage() {
-  const conversations = await conversationLogsRepository.listConversations();
+import { ConversationsFilterBar } from "@/components/dashboard/conversations-filter-bar";
+
+function formatDuration(seconds: number | null | undefined) {
+  if (!seconds) return "—";
+  const minutes = Math.floor(seconds / 60);
+  const remaining = seconds % 60;
+  return `${minutes}:${remaining.toString().padStart(2, "0")}`;
+}
+
+export default async function ConversationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const resolvedSearchParams = await searchParams;
+  const filters = conversationFiltersSchema.parse({
+    q: resolvedSearchParams.q,
+    status: resolvedSearchParams.status,
+    page: resolvedSearchParams.page,
+    pageSize: resolvedSearchParams.pageSize,
+  });
+
+  const [conversations, totalItems] = await Promise.all([
+    conversationLogsRepository.listConversations(filters),
+    conversationLogsRepository.countConversations(filters),
+  ]);
+
+  function buildHref(page: number) {
+    const params = new URLSearchParams();
+    if (filters.q) params.set("q", filters.q);
+    if (filters.status) params.set("status", filters.status);
+    params.set("page", String(page));
+    return `/dashboard/conversations?${params.toString()}`;
+  }
 
   return (
     <div className="space-y-6">
       <PageHeader title="Conversations" description="Voice calls and transcript logs generated through Vapi." />
 
-      {conversations.length === 0 ? (
-        <EmptyState title="No conversations yet" description="Calls routed through Vapi and n8n will appear here." />
-      ) : (
-        <div className="space-y-4">
-          {conversations.map((conversation) => (
-            <Card key={conversation.id}>
-              <CardContent className="p-6">
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div>
-                    <Link
-                      href={`/dashboard/leads/${conversation.lead.id}`}
-                      className="text-sm font-medium text-primary hover:underline"
-                    >
-                      {conversation.lead.patientName}
-                    </Link>
-                    <h3 className="mt-1 text-lg font-semibold text-foreground">
-                      {conversation.summary ?? "Conversation summary"}
-                    </h3>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <StatusBadge value={conversation.provider} />
-                    <p className="text-sm text-muted-foreground">{conversation.createdAt.toLocaleString()}</p>
-                  </div>
-                </div>
-                <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
-                  {conversation.transcript}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+      <ConversationsFilterBar />
+
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
+        {conversations.length === 0 ? (
+          <div className="p-6">
+            <EmptyState title="No conversations match your filters" description="Try adjusting your search or filters." />
+          </div>
+        ) : (
+          <>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Patient</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Duration</TableHead>
+                  <TableHead>Summary</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {conversations.map((conversation) => (
+                  <TableRow key={conversation.id}>
+                    <TableCell className="font-medium">
+                      <Link href={`/dashboard/conversations/${conversation.id}`} className="hover:text-primary">
+                        {conversation.lead.patientName}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{conversation.createdAt.toLocaleString()}</TableCell>
+                    <TableCell className="text-muted-foreground">{formatDuration(conversation.durationSeconds)}</TableCell>
+                    <TableCell className="max-w-xs truncate text-muted-foreground">
+                      {conversation.summary ?? "—"}
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge value={conversation.status} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <Pagination page={filters.page} pageSize={filters.pageSize} totalItems={totalItems} buildHref={buildHref} />
+          </>
+        )}
+      </div>
     </div>
   );
 }

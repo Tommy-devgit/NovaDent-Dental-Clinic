@@ -70,9 +70,9 @@ export function HeroSection() {
               Book Appointment
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link href="tel:+15551234567">
+              <Link href="tel:+447863789108">
                 <PhoneCall className="size-4" />
-                (555) 123-4567
+                +44 7863 789108
               </Link>
             </Button>
           </div>

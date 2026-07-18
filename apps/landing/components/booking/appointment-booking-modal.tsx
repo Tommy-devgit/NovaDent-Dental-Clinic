@@ -140,7 +140,7 @@ export function AppointmentBookingModal() {
                       <FormItem>
                         <FormLabel>Phone number</FormLabel>
                         <FormControl>
-                          <Input type="tel" placeholder="(555) 123-4567" {...field} />
+                          <Input type="tel" placeholder="07863 789108" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

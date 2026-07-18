@@ -12,7 +12,7 @@ import { openBooking } from "@/lib/booking-events";
 import { Reveal } from "../motion/reveal";
 
 const CONTACT_DETAILS = [
-  { icon: Phone, label: "Phone", value: "(555) 123-4567", href: "tel:+15551234567" },
+  { icon: Phone, label: "Phone", value: "+44 7863 789108", href: "tel:+447863789108" },
   { icon: Mail, label: "Email", value: "hello@novadent.com", href: "mailto:hello@novadent.com" },
   { icon: MapPin, label: "Address", value: "100 Dental Avenue, Suite 200", href: undefined },
   { icon: Clock, label: "Hours", value: "Mon–Fri 8am–6pm, Sat 9am–2pm", href: undefined },
@@ -52,7 +52,7 @@ export function ContactSection() {
                     Book Appointment
                   </Button>
                   <Button variant="outline" asChild>
-                    <Link href="tel:+15551234567">Call the clinic</Link>
+                    <Link href="tel:+447863789108">Call the clinic</Link>
                   </Button>
                 </div>
               </div>

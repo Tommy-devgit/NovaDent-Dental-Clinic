@@ -28,7 +28,7 @@ const FOOTER_LINKS = [
 ];
 
 const CONTACT_LINES = [
-  { icon: Phone, value: "(555) 123-4567", href: "tel:+15551234567" },
+  { icon: Phone, value: "+44 7863 789108", href: "tel:+447863789108" },
   { icon: Mail, value: "hello@novadent.com", href: "mailto:hello@novadent.com" },
   { icon: MapPin, value: "100 Dental Avenue, Suite 200, Riverside", href: undefined },
   { icon: Clock, value: "Mon–Fri 8am–6pm · Sat 9am–2pm", href: undefined },

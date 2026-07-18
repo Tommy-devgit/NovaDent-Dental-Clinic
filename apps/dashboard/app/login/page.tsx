@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Sparkles } from "lucide-react";
+import { Stethoscope } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
@@ -59,7 +59,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-lg">
         <CardContent className="p-8">
           <span className="flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <Sparkles className="size-5" />
+            <Stethoscope className="size-5" />
           </span>
           <h1 className="mt-6 text-2xl font-semibold tracking-tight text-foreground">Staff login</h1>
           <p className="mt-1 text-sm text-muted-foreground">Secure access for NovaDent admin and reception staff.</p>

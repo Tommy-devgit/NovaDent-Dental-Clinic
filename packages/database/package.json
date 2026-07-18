@@ -5,6 +5,7 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "scripts": {
+    "postinstall": "prisma generate",
     "generate": "node --env-file=.env ../../node_modules/prisma/build/index.js generate",
     "migrate:deploy": "node --env-file=.env ../../node_modules/prisma/build/index.js migrate deploy",
     "migrate:resolve": "node --env-file=.env ../../node_modules/prisma/build/index.js migrate resolve",

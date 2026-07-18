@@ -1,5 +1,7 @@
 import { Award, Bot, Cpu, HeartHandshake, Zap } from "lucide-react";
 
+import { Reveal, RevealGroup, RevealItem } from "../motion/reveal";
+
 const REASONS = [
   {
     icon: Award,
@@ -32,24 +34,24 @@ export function WhyChooseSection() {
   return (
     <section id="why-choose-us" className="bg-secondary/40 px-6 py-20 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
-        <div className="max-w-2xl">
+        <Reveal className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-wide text-primary">Why Choose NovaDent</p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             A modern clinic built around getting you seen faster
           </h2>
-        </div>
+        </Reveal>
 
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+        <RevealGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
           {REASONS.map((reason) => (
-            <div key={reason.title} className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <RevealItem key={reason.title} className="rounded-2xl border border-border bg-card p-6 shadow-sm">
               <span className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <reason.icon className="size-5" />
               </span>
               <p className="mt-4 font-semibold text-foreground">{reason.title}</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">{reason.description}</p>
-            </div>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
       </div>
     </section>
   );

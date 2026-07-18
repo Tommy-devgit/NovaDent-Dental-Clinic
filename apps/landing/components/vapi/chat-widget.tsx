@@ -1,12 +1,15 @@
 "use client";
 
-import { Loader2, MessageCircle, Send, Sparkles, X } from "lucide-react";
+import { Loader2, MessageCircle, Send, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { Button, Input } from "@novadent/ui";
 
 import { OPEN_ASSISTANT_EVENT } from "@/lib/assistant-events";
 import { useNovadentChat } from "@/lib/use-novadent-chat";
+
+const GREETING =
+  "Hi, this is the NovaDent Assistant. Ask me anything about our services, or let me know if you'd like to book an appointment.";
 
 export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,7 +51,7 @@ export function ChatWidget() {
           <div className="flex items-center justify-between gap-3 border-b border-border p-4">
             <div className="flex items-center gap-2.5">
               <span className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <Sparkles className="size-4" />
+                <MessageCircle className="size-4" />
               </span>
               <p className="text-sm font-semibold text-foreground">Chat</p>
             </div>
@@ -66,23 +69,24 @@ export function ChatWidget() {
               <p className="text-center text-sm text-muted-foreground">
                 Chat isn&apos;t available right now — please use the contact form instead.
               </p>
-            ) : chat.messages.length === 0 ? (
-              <p className="text-center text-sm text-muted-foreground">
-                Ask us anything — send a message to get started.
-              </p>
             ) : (
-              chat.messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={
-                    message.role === "assistant"
-                      ? "max-w-[85%] rounded-2xl rounded-bl-sm bg-muted px-4 py-2.5 text-sm leading-6 text-foreground"
-                      : "ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-4 py-2.5 text-sm leading-6 text-primary-foreground"
-                  }
-                >
-                  {message.content}
+              <>
+                <div className="max-w-[85%] rounded-2xl rounded-bl-sm bg-muted px-4 py-2.5 text-sm leading-6 text-foreground">
+                  {GREETING}
                 </div>
-              ))
+                {chat.messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={
+                      message.role === "assistant"
+                        ? "max-w-[85%] rounded-2xl rounded-bl-sm bg-muted px-4 py-2.5 text-sm leading-6 text-foreground"
+                        : "ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-4 py-2.5 text-sm leading-6 text-primary-foreground"
+                    }
+                  >
+                    {message.content}
+                  </div>
+                ))}
+              </>
             )}
             {chat.isLoading ? (
               <div className="flex max-w-[85%] items-center gap-1 rounded-2xl rounded-bl-sm bg-muted px-4 py-3">

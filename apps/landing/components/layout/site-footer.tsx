@@ -1,4 +1,4 @@
-import { Clock, Mail, MapPin, Phone, ShieldCheck, Sparkles } from "lucide-react";
+import { Clock, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
 const FOOTER_LINKS = [
@@ -40,10 +40,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           <div className="sm:col-span-2 lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2.5 font-semibold tracking-tight text-foreground">
-              <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                <Sparkles className="size-4" />
-              </span>
+            <Link href="/" className="text-xl font-bold tracking-tight text-foreground">
               NovaDent
             </Link>
             <p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">

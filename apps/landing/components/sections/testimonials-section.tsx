@@ -1,4 +1,9 @@
+"use client";
+
 import { Star } from "lucide-react";
+import { motion } from "motion/react";
+
+import { Reveal, revealItemVariants } from "../motion/reveal";
 
 const TESTIMONIALS = [
   {
@@ -34,16 +39,26 @@ export function TestimonialsSection() {
   return (
     <section className="px-6 py-20 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
-        <div className="max-w-2xl">
+        <Reveal className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-wide text-primary">Testimonials</p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             What patients say about NovaDent
           </h2>
-        </div>
+        </Reveal>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-3">
+        <motion.div
+          className="mt-12 grid gap-6 lg:grid-cols-3"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-80px" }}
+          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1 } } }}
+        >
           {TESTIMONIALS.map((item) => (
-            <blockquote key={item.name} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+            <motion.blockquote
+              key={item.name}
+              variants={revealItemVariants}
+              className="rounded-2xl border border-border bg-card p-8 shadow-sm"
+            >
               <div className="flex gap-1 text-primary">
                 {Array.from({ length: 5 }).map((_, index) => (
                   <Star key={index} className="size-4 fill-current" />
@@ -54,9 +69,9 @@ export function TestimonialsSection() {
                 <p className="font-semibold text-foreground">{item.name}</p>
                 <p className="text-muted-foreground">{item.role}</p>
               </footer>
-            </blockquote>
+            </motion.blockquote>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

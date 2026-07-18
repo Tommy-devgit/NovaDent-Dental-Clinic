@@ -7,7 +7,7 @@ import {
   MessagesSquare,
   Menu,
   Settings,
-  Sparkles,
+  Stethoscope,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -119,11 +119,11 @@ export function DashboardShell({
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background lg:flex">
-      <aside className="hidden border-r border-border bg-card px-4 py-6 lg:block lg:w-64">
+    <div className="flex h-screen overflow-hidden bg-background">
+      <aside className="hidden h-screen shrink-0 overflow-y-auto border-r border-border bg-card px-4 py-6 lg:block lg:w-64">
         <Link href="/dashboard" className="flex items-center gap-2.5 px-2 font-semibold tracking-tight text-foreground">
           <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Sparkles className="size-4" />
+            <Stethoscope className="size-4" />
           </span>
           <span>
             NovaDent
@@ -136,8 +136,8 @@ export function DashboardShell({
         </div>
       </aside>
 
-      <div className="flex min-h-screen flex-1 flex-col">
-        <header className="border-b border-border bg-card px-4 py-3 lg:px-8">
+      <div className="flex h-screen flex-1 flex-col overflow-hidden">
+        <header className="shrink-0 border-b border-border bg-card px-4 py-3 lg:px-8">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 lg:hidden">
               <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
@@ -164,7 +164,7 @@ export function DashboardShell({
           </div>
         </header>
 
-        <main className="flex-1 px-4 py-6 lg:px-8 lg:py-8">
+        <main className="flex-1 overflow-y-auto px-4 py-6 lg:px-8 lg:py-8">
           <div className="mx-auto max-w-7xl">{children}</div>
         </main>
       </div>

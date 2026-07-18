@@ -1,8 +1,10 @@
 "use client";
 
-import { CalendarCheck, PhoneCall, ShieldCheck, Sparkles, Stethoscope } from "lucide-react";
+import { CalendarCheck, PhoneCall, ShieldCheck, Stethoscope } from "lucide-react";
+import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRef } from "react";
 
 import { Button } from "@novadent/ui";
 
@@ -17,9 +19,18 @@ const TRUST_INDICATORS = [
 ];
 
 export function HeroSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", prefersReducedMotion ? "0%" : "12%"]);
+
   return (
-    <section className="relative isolate overflow-hidden px-6 pb-20 pt-16 lg:px-8 lg:pb-28 lg:pt-24">
-      <div aria-hidden className="absolute inset-0 -z-20">
+    <section ref={sectionRef} className="relative isolate overflow-hidden px-6 pb-20 pt-16 lg:px-8 lg:pb-28 lg:pt-24">
+      <motion.div aria-hidden className="absolute inset-0 -z-20" style={{ y: imageY }}>
         <Image
           src="/images/hero-dental-office.jpg"
           alt=""
@@ -28,7 +39,7 @@ export function HeroSection() {
           sizes="100vw"
           className="object-cover"
         />
-      </div>
+      </motion.div>
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-background via-background/92 to-background/55"
@@ -39,8 +50,12 @@ export function HeroSection() {
       />
 
       <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1fr_1fr] lg:items-center">
-        <div className="max-w-2xl">
-
+        <motion.div
+          className="max-w-2xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
           <h1 className="mt-6 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
             Meet NovaDent&apos;s AI receptionist.
           </h1>
@@ -72,9 +87,20 @@ export function HeroSection() {
               </div>
             ))}
           </dl>
-        </div>
+        </motion.div>
 
-        <HeroAssistantCard />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96, y: 12 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+        >
+          <motion.div
+            animate={prefersReducedMotion ? undefined : { y: [0, -8, 0] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+          >
+            <HeroAssistantCard />
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

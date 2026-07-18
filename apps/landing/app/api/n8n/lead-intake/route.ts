@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 
-import { activityLogsRepository, conversationLogsRepository, patientLeadsRepository } from "@novadent/database";
+import {
+  activityLogsRepository,
+  appointmentsRepository,
+  conversationLogsRepository,
+  patientLeadsRepository,
+} from "@novadent/database";
 import type { Prisma } from "@novadent/database";
 import { vapiIntakeWebhookSchema } from "@novadent/validations";
 
@@ -65,7 +70,7 @@ export async function POST(request: Request) {
     endedAt: data.endedAt,
   });
 
-  await Promise.all([
+  const activityLogPromises = [
     activityLogsRepository.logActivity({
       action: existingLead ? "LEAD_UPDATED" : "LEAD_CREATED",
       resourceType: "PatientLead",
@@ -78,7 +83,35 @@ export async function POST(request: Request) {
       resourceId: conversationLog.id,
       metadata: { leadId: lead.id },
     }),
-  ]).catch(() => undefined);
+  ];
 
-  return NextResponse.json({ leadId: lead.id, conversationLogId: conversationLog.id }, { status: 201 });
+  // Only the lead carried an appointmentRequestedAt before this — nothing ever turned it into
+  // an actual Appointment row, so voice/chat-driven booking never showed up on the calendar.
+  let appointmentId: string | undefined;
+  const hasExistingAppointment = existingLead
+    ? await patientLeadsRepository.getLeadById(existingLead.id).then((full) => (full?.appointments.length ?? 0) > 0)
+    : false;
+
+  if (data.appointmentRequestedAt && !hasExistingAppointment) {
+    const appointment = await appointmentsRepository.createAppointment({
+      leadId: lead.id,
+      conversationLogId: conversationLog.id,
+      scheduledFor: data.appointmentRequestedAt,
+      notes: data.summary,
+    });
+    appointmentId = appointment.id;
+
+    activityLogPromises.push(
+      activityLogsRepository.logActivity({
+        action: "APPOINTMENT_CREATED",
+        resourceType: "Appointment",
+        resourceId: appointment.id,
+        metadata: { leadId: lead.id, scheduledFor: data.appointmentRequestedAt, source: "vapi" },
+      }),
+    );
+  }
+
+  await Promise.all(activityLogPromises).catch(() => undefined);
+
+  return NextResponse.json({ leadId: lead.id, conversationLogId: conversationLog.id, appointmentId }, { status: 201 });
 }

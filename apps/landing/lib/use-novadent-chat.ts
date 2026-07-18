@@ -21,7 +21,7 @@ function persistChat(sessionId: string, messages: ChatMessage[], status: "IN_PRO
       externalConversationId: sessionId,
       channel: "chat",
       status,
-      transcript: messages,
+      transcript: messages.map((message) => ({ role: message.role, text: message.content })),
       endedAt: new Date().toISOString(),
     }),
     keepalive,
@@ -86,7 +86,11 @@ export function useNovadentChat() {
       const response = await fetch("/api/assistant/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: trimmed, previousChatId: chatIdRef.current ?? undefined }),
+        body: JSON.stringify({
+          message: trimmed,
+          sessionId: sessionIdRef.current,
+          previousChatId: chatIdRef.current ?? undefined,
+        }),
       });
 
       const data = (await response.json().catch(() => null)) as { chatId?: string; reply?: string; error?: string } | null;

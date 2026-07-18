@@ -1,10 +1,13 @@
 "use client";
 
 import { Sparkle, Droplets, Hammer, AlignCenter, Anchor, Siren, Gem } from "lucide-react";
+import { motion } from "motion/react";
 
 import { Badge, Button, Card, CardContent, CardDescription, CardTitle } from "@novadent/ui";
 
 import { openAssistant } from "@/lib/assistant-events";
+
+import { Reveal, RevealGroup, RevealItem } from "../motion/reveal";
 
 const SERVICES = [
   {
@@ -62,7 +65,7 @@ export function ServicesSection() {
   return (
     <section id="services" className="px-6 py-20 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
-        <div className="max-w-2xl">
+        <Reveal className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-wide text-primary">Services</p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             Dental care designed for quick, confident routing
@@ -74,25 +77,29 @@ export function ServicesSection() {
           <Button className="mt-6" variant="outline" onClick={openAssistant}>
             Ask About Dental Services
           </Button>
-        </div>
+        </Reveal>
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <RevealGroup className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {SERVICES.map((service) => (
-            <Card key={service.name} className="transition-shadow hover:shadow-md">
-              <CardContent className="p-6">
-                <span className="flex size-11 items-center justify-center rounded-xl bg-secondary text-primary">
-                  <service.icon className="size-5" />
-                </span>
-                <CardTitle className="mt-4">{service.name}</CardTitle>
-                <CardDescription className="mt-2 leading-6">{service.description}</CardDescription>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Badge variant="secondary">{service.duration}</Badge>
-                  <Badge variant="outline">{service.cadence}</Badge>
-                </div>
-              </CardContent>
-            </Card>
+            <RevealItem key={service.name}>
+              <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2, ease: "easeOut" }} className="h-full">
+                <Card className="h-full transition-shadow hover:shadow-md">
+                  <CardContent className="p-6">
+                    <span className="flex size-11 items-center justify-center rounded-xl bg-secondary text-primary">
+                      <service.icon className="size-5" />
+                    </span>
+                    <CardTitle className="mt-4">{service.name}</CardTitle>
+                    <CardDescription className="mt-2 leading-6">{service.description}</CardDescription>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <Badge variant="secondary">{service.duration}</Badge>
+                      <Badge variant="outline">{service.cadence}</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
       </div>
     </section>
   );

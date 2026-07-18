@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Loader2, Mic, MicOff, PhoneOff, Send, Sparkles } from "lucide-react";
+import { AlertTriangle, Headset, Loader2, Mic, MicOff, PhoneOff, Send } from "lucide-react";
 import { useState } from "react";
 
 import { Badge, Button, Input } from "@novadent/ui";
@@ -90,7 +90,7 @@ export function HeroAssistantCard() {
             ) : assistant.status === "error" ? (
               <AlertTriangle className="size-10" />
             ) : (
-              <Sparkles className="size-10" />
+              <Headset className="size-10" />
             )}
           </div>
         </div>

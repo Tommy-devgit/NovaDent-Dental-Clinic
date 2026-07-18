@@ -1,5 +1,7 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@novadent/ui";
 
+import { Reveal } from "../motion/reveal";
+
 const FAQS = [
   {
     question: "How does the AI assistant work?",
@@ -42,21 +44,23 @@ export function FaqSection() {
   return (
     <section id="faq" className="px-6 py-20 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-3xl">
-        <div className="text-center">
+        <Reveal className="text-center">
           <p className="text-sm font-semibold uppercase tracking-wide text-primary">FAQ</p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             Questions patients ask us most
           </h2>
-        </div>
+        </Reveal>
 
-        <Accordion type="single" collapsible className="mt-10">
-          {FAQS.map((faq) => (
-            <AccordionItem key={faq.question} value={faq.question}>
-              <AccordionTrigger>{faq.question}</AccordionTrigger>
-              <AccordionContent>{faq.answer}</AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+        <Reveal delay={0.1}>
+          <Accordion type="single" collapsible className="mt-10">
+            {FAQS.map((faq) => (
+              <AccordionItem key={faq.question} value={faq.question}>
+                <AccordionTrigger>{faq.question}</AccordionTrigger>
+                <AccordionContent>{faq.answer}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </Reveal>
       </div>
     </section>
   );

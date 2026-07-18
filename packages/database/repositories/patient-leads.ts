@@ -166,6 +166,7 @@ export const patientLeadsRepository = {
     reasonForVisit: string;
     symptoms?: string;
     urgency?: string;
+    isNewPatient?: boolean;
     transcript: string;
     summary?: string;
     vapiConversationId: string;
@@ -181,6 +182,7 @@ export const patientLeadsRepository = {
         reasonForVisit: payload.reasonForVisit,
         symptoms: payload.symptoms,
         urgency: (payload.urgency as never) ?? "LOW",
+        isNewPatient: payload.isNewPatient,
         transcript: payload.transcript,
         conversationSummary: payload.summary,
         vapiConversationId: payload.vapiConversationId,
@@ -194,6 +196,7 @@ export const patientLeadsRepository = {
         reasonForVisit: payload.reasonForVisit,
         symptoms: payload.symptoms,
         urgency: (payload.urgency as never) ?? undefined,
+        isNewPatient: payload.isNewPatient,
         transcript: payload.transcript,
         conversationSummary: payload.summary,
         n8nExecutionId: payload.n8nExecutionId,

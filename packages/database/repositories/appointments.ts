@@ -40,6 +40,7 @@ export const appointmentsRepository = {
 
   createAppointment(input: {
     leadId: string;
+    conversationLogId?: string;
     scheduledFor: Date;
     durationMinutes?: number;
     notes?: string;
@@ -49,6 +50,7 @@ export const appointmentsRepository = {
     return prisma.appointment.create({
       data: {
         leadId: input.leadId,
+        conversationLogId: input.conversationLogId,
         scheduledFor: input.scheduledFor,
         durationMinutes: input.durationMinutes ?? 30,
         notes: input.notes,

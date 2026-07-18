@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, Sparkles } from "lucide-react";
+import { MessageCircle, Menu } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -30,14 +30,8 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4 lg:px-8">
-        <Link href="/" className="flex items-center gap-2.5 font-semibold tracking-tight text-foreground">
-          <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-            <Sparkles className="size-4" />
-          </span>
-          <span className="leading-tight">
-            NovaDent
-            <span className="block text-xs font-normal text-muted-foreground">AI-powered dental care</span>
-          </span>
+        <Link href="/" className="text-xl font-bold tracking-tight text-foreground">
+          NovaDent
         </Link>
 
         <nav className="hidden items-center gap-8 text-sm font-medium text-muted-foreground md:flex">
@@ -52,8 +46,8 @@ export function SiteHeader() {
           <Button variant="outline" size="sm" onClick={() => openBooking()}>
             Book Appointment
           </Button>
-          <Button size="sm" onClick={openAssistant}>
-            Chat with NovaDent AI
+          <Button size="icon" onClick={openAssistant} aria-label="Chat with NovaDent AI" title="Chat with NovaDent AI">
+            <MessageCircle className="size-4" />
           </Button>
         </div>
 
@@ -95,6 +89,7 @@ export function SiteHeader() {
                     openAssistant();
                   }}
                 >
+                  <MessageCircle className="size-4" />
                   Chat with NovaDent AI
                 </Button>
               </SheetClose>

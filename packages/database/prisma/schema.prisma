@@ -125,6 +125,7 @@ model PatientLead {
 model Appointment {
   id                      String            @id @default(cuid())
   leadId                  String
+  conversationLogId       String?
   scheduledFor            DateTime
   durationMinutes         Int               @default(30)
   status                  AppointmentStatus @default(SCHEDULED)
@@ -139,11 +140,13 @@ model Appointment {
   updatedAt               DateTime          @updatedAt
 
   lead                    PatientLead       @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  conversationLog         ConversationLog?  @relation(fields: [conversationLogId], references: [id], onDelete: SetNull)
   createdByStaffUser      StaffUser?        @relation("AppointmentCreator", fields: [createdByStaffUserId], references: [id], onDelete: SetNull)
   updatedByStaffUser      StaffUser?        @relation("AppointmentUpdater", fields: [updatedByStaffUserId], references: [id], onDelete: SetNull)
 
   @@map("appointments")
   @@index([leadId])
+  @@index([conversationLogId])
   @@index([status])
   @@index([scheduledFor])
 }
@@ -158,6 +161,7 @@ model ConversationLog {
   durationSeconds         Int?
   summary                 String?
   transcript              String
+  recordingUrl            String?
   metadata                Json?
   startedAt               DateTime?
   endedAt                 DateTime?
@@ -165,6 +169,7 @@ model ConversationLog {
   updatedAt               DateTime            @updatedAt
 
   lead                    PatientLead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  appointments            Appointment[]
 
   @@map("conversation_logs")
   @@index([leadId])

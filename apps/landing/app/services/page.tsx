@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 
 import { MarketingShell } from "@/components/layout/marketing-shell";
 import { HowItWorksSection } from "@/components/sections/how-it-works-section";
@@ -15,15 +16,26 @@ export default function ServicesPage() {
   return (
     <MarketingShell>
       <section className="px-6 py-20 lg:px-8 lg:py-28">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-wide text-primary">Dental Services</p>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-            Every service, routed the moment you ask
-          </h1>
-          <p className="mt-6 text-base leading-7 text-muted-foreground">
-            Describe your symptoms or what you&apos;re looking for to our AI assistant, and you&apos;ll be pointed to the
-            right service and next steps immediately — no need to know the exact procedure name yourself.
-          </p>
+        <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wide text-primary">Dental Services</p>
+            <h1 className="mt-2 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+              Every service, routed the moment you ask
+            </h1>
+            <p className="mt-6 text-base leading-7 text-muted-foreground">
+              Describe your symptoms or what you&apos;re looking for to our AI assistant, and you&apos;ll be pointed to
+              the right service and next steps immediately — no need to know the exact procedure name yourself.
+            </p>
+          </div>
+          <div className="relative aspect-4/5 overflow-hidden rounded-3xl shadow-xl">
+            <Image
+              src="/images/services-dental-scanner.jpg"
+              alt="A dentist reviewing a digital scan of a patient's teeth during a consultation"
+              fill
+              sizes="(min-width: 1024px) 40vw, 90vw"
+              className="object-cover"
+            />
+          </div>
         </div>
       </section>
 

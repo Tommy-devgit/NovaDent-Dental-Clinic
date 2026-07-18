@@ -43,6 +43,8 @@ function persistConversation(payload: {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       externalConversationId: payload.externalConversationId,
+      channel: "voice",
+      status: "COMPLETED",
       transcript: payload.transcript,
       startedAt: payload.startedAt ? new Date(payload.startedAt).toISOString() : undefined,
       endedAt: new Date(payload.endedAt).toISOString(),

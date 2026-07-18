@@ -40,6 +40,9 @@ export const conversationLogsRepository = {
       where: { id },
       include: {
         lead: true,
+        appointments: {
+          orderBy: { scheduledFor: "desc" },
+        },
       },
     });
   },
@@ -48,6 +51,12 @@ export const conversationLogsRepository = {
     return prisma.conversationLog.findMany({
       where: { leadId },
       orderBy: { createdAt: "desc" },
+    });
+  },
+
+  findByExternalConversationId(externalConversationId: string) {
+    return prisma.conversationLog.findUnique({
+      where: { externalConversationId },
     });
   },
 
@@ -60,6 +69,7 @@ export const conversationLogsRepository = {
     durationSeconds?: number;
     summary?: string;
     transcript: string;
+    recordingUrl?: string;
     metadata?: Prisma.InputJsonValue;
     startedAt?: Date;
     endedAt?: Date;
@@ -74,6 +84,7 @@ export const conversationLogsRepository = {
         durationSeconds: input.durationSeconds,
         summary: input.summary,
         transcript: input.transcript,
+        recordingUrl: input.recordingUrl,
         metadata: input.metadata,
         startedAt: input.startedAt,
         endedAt: input.endedAt,
@@ -90,6 +101,7 @@ export const conversationLogsRepository = {
     durationSeconds?: number;
     summary?: string;
     transcript: string;
+    recordingUrl?: string;
     metadata?: Prisma.InputJsonValue;
     startedAt?: Date;
     endedAt?: Date;
@@ -105,6 +117,7 @@ export const conversationLogsRepository = {
         durationSeconds: input.durationSeconds,
         summary: input.summary,
         transcript: input.transcript,
+        recordingUrl: input.recordingUrl,
         metadata: input.metadata,
         startedAt: input.startedAt,
         endedAt: input.endedAt,
@@ -115,10 +128,18 @@ export const conversationLogsRepository = {
         durationSeconds: input.durationSeconds,
         summary: input.summary,
         transcript: input.transcript,
+        recordingUrl: input.recordingUrl,
         metadata: input.metadata,
         startedAt: input.startedAt,
         endedAt: input.endedAt,
       },
+    });
+  },
+
+  setRecordingUrl(externalConversationId: string, recordingUrl: string) {
+    return prisma.conversationLog.update({
+      where: { externalConversationId },
+      data: { recordingUrl },
     });
   },
 };

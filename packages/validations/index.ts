@@ -1,5 +1,7 @@
 export * from "./appointment";
 export * from "./appointment-booking";
+export * from "./assistant-chat";
+export * from "./assistant-tools";
 export * from "./auth";
 export * from "./clinic-setting";
 export * from "./conversation-completion";

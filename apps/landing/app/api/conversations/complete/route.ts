@@ -1,7 +1,9 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 
 import { activityLogsRepository, conversationLogsRepository, patientLeadsRepository } from "@novadent/database";
 import { conversationCompletionSchema } from "@novadent/validations";
+
+import { fetchCallRecordingUrl } from "@/lib/vapi-server";
 
 function buildTranscriptText(transcript: { role: "user" | "assistant"; text: string }[]) {
   return transcript.map((entry) => `${entry.role === "user" ? "Patient" : "Assistant"}: ${entry.text}`).join("\n");
@@ -37,13 +39,16 @@ export async function POST(request: Request) {
     vapiConversationId: data.externalConversationId,
   });
 
+  const status = data.status ?? "COMPLETED";
+
   const conversationLog = await conversationLogsRepository.upsertConversationLog({
     leadId: lead.id,
     provider: "VAPI",
     externalConversationId: data.externalConversationId,
-    status: "COMPLETED",
+    status,
     durationSeconds,
     transcript: transcriptText,
+    metadata: { channel: data.channel },
     startedAt: data.startedAt,
     endedAt: data.endedAt,
   });
@@ -53,15 +58,38 @@ export async function POST(request: Request) {
       action: existingLead ? "LEAD_UPDATED" : "LEAD_CREATED",
       resourceType: "PatientLead",
       resourceId: lead.id,
-      metadata: { source: "website_chat" },
+      metadata: { source: data.channel === "chat" ? "website_chat" : "website_voice" },
     }),
     activityLogsRepository.logActivity({
-      action: "CONVERSATION_ENDED",
+      action: status === "IN_PROGRESS" ? "CONVERSATION_STARTED" : "CONVERSATION_ENDED",
       resourceType: "ConversationLog",
       resourceId: conversationLog.id,
-      metadata: { leadId: lead.id },
+      metadata: { leadId: lead.id, channel: data.channel },
     }),
   ]).catch(() => undefined);
+
+  if (data.channel === "voice" && status === "COMPLETED") {
+    after(async () => {
+      const recording = await fetchCallRecordingUrl(data.externalConversationId);
+      if (recording?.recordingUrl) {
+        await conversationLogsRepository
+          .upsertConversationLog({
+            leadId: lead.id,
+            provider: "VAPI",
+            externalConversationId: data.externalConversationId,
+            status,
+            durationSeconds,
+            transcript: transcriptText,
+            recordingUrl: recording.recordingUrl,
+            summary: recording.summary,
+            metadata: { channel: data.channel },
+            startedAt: data.startedAt,
+            endedAt: data.endedAt,
+          })
+          .catch(() => undefined);
+      }
+    });
+  }
 
   return NextResponse.json({ leadId: lead.id, conversationLogId: conversationLog.id }, { status: 201 });
 }

@@ -43,6 +43,31 @@ export default async function ConversationDetailsPage({ params }: { params: Prom
             </CardContent>
           </Card>
 
+          {conversation.recordingUrl ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Recording</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <audio controls preload="none" src={conversation.recordingUrl} className="w-full">
+                  Your browser doesn&apos;t support inline audio playback.
+                  <a href={conversation.recordingUrl}>Download the recording</a> instead.
+                </audio>
+              </CardContent>
+            </Card>
+          ) : conversation.provider === "VAPI" ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Recording</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  No recording available for this conversation.
+                </p>
+              </CardContent>
+            </Card>
+          ) : null}
+
           <Card>
             <CardHeader>
               <CardTitle>Full transcript</CardTitle>
@@ -83,6 +108,33 @@ export default async function ConversationDetailsPage({ params }: { params: Prom
               <Info label="Duration" value={formatDuration(conversation.durationSeconds)} />
             </CardContent>
           </Card>
+
+          {conversation.appointments.length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Booked from this conversation</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {conversation.appointments.map((appointment) => (
+                  <Link
+                    key={appointment.id}
+                    href="/dashboard/appointments"
+                    className="block rounded-lg bg-muted/50 p-3 transition-colors hover:bg-muted"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-medium text-foreground">
+                        {appointment.scheduledFor.toLocaleString()}
+                      </p>
+                      <StatusBadge value={appointment.status} />
+                    </div>
+                    {appointment.notes ? (
+                      <p className="mt-1 text-xs text-muted-foreground">{appointment.notes}</p>
+                    ) : null}
+                  </Link>
+                ))}
+              </CardContent>
+            </Card>
+          ) : null}
 
           <Card>
             <CardHeader>

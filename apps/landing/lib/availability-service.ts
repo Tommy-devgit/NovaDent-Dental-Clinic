@@ -6,13 +6,15 @@ import { parseLondonDateTime } from "./datetime";
 const SLOT_MINUTES = 30;
 const DAY_NAMES = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
 
+// Matches the advertised opening hours (Mon–Fri 8am–6pm, Sat 9am–2pm, closed Sunday)
+// so the booking diary never offers or blocks times outside what the clinic promises.
 const DEFAULT_HOURS: Record<string, WorkingWindow> = {
-  monday: { open: "09:00", close: "17:00" },
-  tuesday: { open: "09:00", close: "17:00" },
-  wednesday: { open: "09:00", close: "17:00" },
-  thursday: { open: "09:00", close: "17:00" },
-  friday: { open: "09:00", close: "17:00" },
-  saturday: { open: "09:00", close: "13:00" },
+  monday: { open: "08:00", close: "18:00" },
+  tuesday: { open: "08:00", close: "18:00" },
+  wednesday: { open: "08:00", close: "18:00" },
+  thursday: { open: "08:00", close: "18:00" },
+  friday: { open: "08:00", close: "18:00" },
+  saturday: { open: "09:00", close: "14:00" },
   sunday: { open: "00:00", close: "00:00", closed: true },
 };
 

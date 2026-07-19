@@ -1,4 +1,4 @@
-# NovaDent
+# NovaDent Dental Clinic
 
 AI-powered dental clinic platform. Patients learn about the clinic and talk to an AI assistant on the public site; the automation stack (Vapi → n8n) writes leads and conversations into Neon; staff manage everything from the admin dashboard.
 

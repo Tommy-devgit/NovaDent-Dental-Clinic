@@ -22,6 +22,21 @@ function isAuthorized(request: Request) {
   return provided === expected;
 }
 
+/** Vapi custom tools require the tool-call id echoed back in a {results:[...]} envelope. */
+function extractToolCallId(body: unknown): string | undefined {
+  if (typeof body !== "object" || body === null) return undefined;
+  const message = (body as { message?: unknown }).message;
+  if (typeof message !== "object" || message === null) return undefined;
+  const list = (message as { toolCallList?: unknown }).toolCallList;
+  if (!Array.isArray(list)) return undefined;
+  for (const call of list) {
+    if (typeof call === "object" && call !== null && typeof (call as { id?: unknown }).id === "string") {
+      return (call as { id: string }).id;
+    }
+  }
+  return undefined;
+}
+
 export async function POST(request: Request) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -119,6 +134,17 @@ export async function POST(request: Request) {
   }
 
   await Promise.all(activityLogPromises).catch(() => undefined);
+
+  // A Vapi tool call needs the result echoed in its own envelope, or the assistant logs
+  // "No result returned" and can't confirm the booking on the call. Direct/n8n callers
+  // (no toolCallId) keep the plain lead payload.
+  const toolCallId = extractToolCallId(body);
+  if (toolCallId) {
+    const result = appointmentId
+      ? "Appointment request received. The practice will call to confirm shortly."
+      : "Your details are saved. The practice will be in touch shortly.";
+    return NextResponse.json({ results: [{ toolCallId, result }] }, { status: 200 });
+  }
 
   return NextResponse.json({ leadId: lead.id, conversationLogId: conversationLog.id, appointmentId }, { status: 201 });
 }

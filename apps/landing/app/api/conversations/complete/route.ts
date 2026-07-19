@@ -4,6 +4,7 @@ import { activityLogsRepository, conversationLogsRepository, patientLeadsReposit
 import { conversationCompletionSchema } from "@novadent/validations";
 
 import { fetchCallRecordingUrl } from "@/lib/vapi-server";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 
 function buildTranscriptText(transcript: { role: "user" | "assistant"; text: string }[]) {
   return transcript.map((entry) => `${entry.role === "user" ? "Patient" : "Assistant"}: ${entry.text}`).join("\n");
@@ -15,6 +16,11 @@ function firstUserMessage(transcript: { role: "user" | "assistant"; text: string
 }
 
 export async function POST(request: Request) {
+  const limit = await rateLimit(`conv-complete:${getClientIp(request)}`, { limit: 10, windowSeconds: 60 });
+  if (!limit.success) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const body = await request.json().catch(() => null);
   const parsed = conversationCompletionSchema.safeParse(body);
 

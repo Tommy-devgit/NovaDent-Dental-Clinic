@@ -9,6 +9,8 @@ import {
 import type { Prisma } from "@novadent/database";
 import { normalizeVapiIntake, vapiIntakeWebhookSchema } from "@novadent/validations";
 
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
+
 function isAuthorized(request: Request) {
   const expected = process.env.N8N_WEBHOOK_SECRET;
 
@@ -23,6 +25,11 @@ function isAuthorized(request: Request) {
 export async function POST(request: Request) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const limit = await rateLimit(`intake:${getClientIp(request)}`, { limit: 120, windowSeconds: 60 });
+  if (!limit.success) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   const body = await request.json().catch(() => null);

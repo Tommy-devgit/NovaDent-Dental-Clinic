@@ -3,7 +3,14 @@ import { NextResponse } from "next/server";
 import { activityLogsRepository, appointmentsRepository, patientLeadsRepository } from "@novadent/database";
 import { publicAppointmentBookingSchema } from "@novadent/validations";
 
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
+
 export async function POST(request: Request) {
+  const limit = await rateLimit(`book:${getClientIp(request)}`, { limit: 5, windowSeconds: 60 });
+  if (!limit.success) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const body = await request.json().catch(() => null);
   const parsed = publicAppointmentBookingSchema.safeParse(body);
 

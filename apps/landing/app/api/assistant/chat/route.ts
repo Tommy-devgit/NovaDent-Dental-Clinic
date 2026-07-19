@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { assistantChatRequestSchema } from "@novadent/validations";
 
 import { getVapiPrivateKey, vapiServerFetch } from "@/lib/vapi-server";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 
 interface VapiChatOutputMessage {
   role?: string;
@@ -72,6 +73,11 @@ async function callVapiChat(message: string, previousChatId: string | undefined)
 }
 
 export async function POST(request: Request) {
+  const limit = await rateLimit(`chat:${getClientIp(request)}`, { limit: 20, windowSeconds: 60 });
+  if (!limit.success) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const body = await request.json().catch(() => null);
   const parsed = assistantChatRequestSchema.safeParse(body);
 

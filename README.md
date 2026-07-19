@@ -24,7 +24,7 @@ This is an npm workspaces monorepo — one `node_modules`, one root install.
 npm install
 ```
 
-Each app needs its own `.env` (copy from `.env.example`):
+Each app needs its own `.env` (copy from `.env):
 
 - `apps/landing/.env` — `DATABASE_URL`, `VAPI_API_KEY`, `N8N_WEBHOOK_URL`, `N8N_WEBHOOK_SECRET`
 - `apps/dashboard/.env` — `DATABASE_URL`, `JWT_SECRET`, `VAPI_API_KEY`, `N8N_WEBHOOK_URL`

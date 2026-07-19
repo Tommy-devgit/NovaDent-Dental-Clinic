@@ -40,6 +40,15 @@ export const conversationLogsRepository = {
     return prisma.conversationLog.count({ where: buildConversationFilters(filters) });
   },
 
+  async exportConversations(filters: { q?: string; status?: string } = {}) {
+    const conversations = await prisma.conversationLog.findMany({
+      where: buildConversationFilters(filters),
+      include: { lead: true },
+      orderBy: { createdAt: "desc" },
+    });
+    return conversations.map((conversation) => decryptConversationWithLead(conversation));
+  },
+
   async getConversationById(id: string) {
     const conversation = await prisma.conversationLog.findUnique({
       where: { id },

@@ -207,4 +207,74 @@ export const patientLeadsRepository = {
       }),
     });
   },
+
+  async assignLead(id: string, assignedStaffUserId: string | null, updatedByStaffUserId?: string) {
+    const lead = await prisma.patientLead.update({
+      where: { id },
+      data: { assignedStaffUserId, updatedByStaffUserId },
+    });
+    return decryptLeadRow(lead);
+  },
+
+  async updateLeadDetails(
+    id: string,
+    fields: { patientName?: string; phone?: string; email?: string; reasonForVisit?: string; urgency?: string },
+    updatedByStaffUserId?: string,
+  ) {
+    const lead = await prisma.patientLead.update({
+      where: { id },
+      data: encryptLeadWrite({
+        patientName: fields.patientName,
+        phone: fields.phone,
+        email: fields.email,
+        reasonForVisit: fields.reasonForVisit,
+        urgency: fields.urgency ? (fields.urgency as never) : undefined,
+        updatedByStaffUserId,
+      }),
+    });
+    return decryptLeadRow(lead);
+  },
+
+  async exportLeads(filters: { q?: string; status?: string; urgency?: string }) {
+    const leads = await prisma.patientLead.findMany({
+      where: buildLeadFilters(filters),
+      include: { assignedStaffUser: true, appointments: { orderBy: { scheduledFor: "desc" }, take: 1 } },
+      orderBy: { createdAt: "desc" },
+    });
+    return leads.map((lead) => decryptLeadRow(lead));
+  },
+
+  /**
+   * GDPR Article 17 erasure: delete the lead (cascades its appointments + conversation logs)
+   * and remove the activity-log rows referencing it (they have no FK, so aren't cascaded).
+   * Returns null if the lead does not exist.
+   */
+  async eraseLead(id: string) {
+    return prisma.$transaction(async (tx) => {
+      const lead = await tx.patientLead.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          appointments: { select: { id: true } },
+          conversationLogs: { select: { id: true } },
+        },
+      });
+      if (!lead) return null;
+
+      const resourceIds = [
+        id,
+        ...lead.appointments.map((appointment) => appointment.id),
+        ...lead.conversationLogs.map((conversation) => conversation.id),
+      ];
+
+      await tx.patientLead.delete({ where: { id } });
+      await tx.activityLog.deleteMany({ where: { resourceId: { in: resourceIds } } });
+
+      return {
+        id,
+        appointmentsRemoved: lead.appointments.length,
+        conversationsRemoved: lead.conversationLogs.length,
+      };
+    });
+  },
 };

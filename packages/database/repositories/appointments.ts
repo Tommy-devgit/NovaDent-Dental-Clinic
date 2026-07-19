@@ -1,5 +1,9 @@
 import { prisma } from "../client";
-import { encryptLeadWrite } from "../lib/pii";
+import { decryptLeadRow, encryptLeadWrite } from "../lib/pii";
+
+function decryptApptLead<T extends { lead: Parameters<typeof decryptLeadRow>[0] | null }>(appt: T): T {
+  return appt.lead ? { ...appt, lead: decryptLeadRow(appt.lead) } : appt;
+}
 
 const ACTIVE_APPOINTMENT_STATUSES = ["SCHEDULED", "CONFIRMED", "RESCHEDULED"] as const;
 
@@ -54,8 +58,8 @@ export const appointmentsRepository = {
     });
   },
 
-  listAppointments() {
-    return prisma.appointment.findMany({
+  async listAppointments() {
+    const rows = await prisma.appointment.findMany({
       include: {
         lead: true,
         createdByStaffUser: true,
@@ -63,10 +67,11 @@ export const appointmentsRepository = {
       },
       orderBy: { scheduledFor: "asc" },
     });
+    return rows.map(decryptApptLead);
   },
 
-  listUpcomingAppointments(limit = 5) {
-    return prisma.appointment.findMany({
+  async listUpcomingAppointments(limit = 5) {
+    const rows = await prisma.appointment.findMany({
       where: {
         scheduledFor: { gte: new Date() },
         status: { in: ["SCHEDULED", "CONFIRMED", "RESCHEDULED"] },
@@ -77,10 +82,11 @@ export const appointmentsRepository = {
       orderBy: { scheduledFor: "asc" },
       take: limit,
     });
+    return rows.map(decryptApptLead);
   },
 
-  listAppointmentsByStatus(status: string) {
-    return prisma.appointment.findMany({
+  async listAppointmentsByStatus(status: string) {
+    const rows = await prisma.appointment.findMany({
       where: { status: status as never },
       include: {
         lead: true,
@@ -89,6 +95,7 @@ export const appointmentsRepository = {
       },
       orderBy: { scheduledFor: "asc" },
     });
+    return rows.map(decryptApptLead);
   },
 
   createAppointment(input: {

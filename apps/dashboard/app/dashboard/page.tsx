@@ -81,7 +81,7 @@ export default async function DashboardPage() {
         />
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+      <div className="space-y-6">
         <RecentLeadsTable
           leads={recentLeads.map((lead) => ({
             id: lead.id,
@@ -93,27 +93,25 @@ export default async function DashboardPage() {
             createdAt: lead.createdAt,
           }))}
         />
-        <div className="space-y-6">
-          <UpcomingAppointments
-            appointments={upcomingAppointments.map((appointment) => ({
-              id: appointment.id,
-              scheduledFor: appointment.scheduledFor,
-              durationMinutes: appointment.durationMinutes,
-              status: appointment.status,
-              lead: { id: appointment.lead.id, patientName: appointment.lead.patientName },
-            }))}
-          />
-          <RecentActivityFeed
-            activity={recentActivity.map((entry) => ({
-              id: entry.id,
-              action: entry.action,
-              createdAt: entry.createdAt,
-              staffUser: entry.staffUser
-                ? { firstName: entry.staffUser.firstName, lastName: entry.staffUser.lastName }
-                : null,
-            }))}
-          />
-        </div>
+        <UpcomingAppointments
+          appointments={upcomingAppointments.map((appointment) => ({
+            id: appointment.id,
+            scheduledFor: appointment.scheduledFor,
+            durationMinutes: appointment.durationMinutes,
+            status: appointment.status,
+            lead: { id: appointment.lead.id, patientName: appointment.lead.patientName },
+          }))}
+        />
+        <RecentActivityFeed
+          activity={recentActivity.map((entry) => ({
+            id: entry.id,
+            action: entry.action,
+            createdAt: entry.createdAt,
+            staffUser: entry.staffUser
+              ? { firstName: entry.staffUser.firstName, lastName: entry.staffUser.lastName }
+              : null,
+          }))}
+        />
       </div>
     </div>
   );

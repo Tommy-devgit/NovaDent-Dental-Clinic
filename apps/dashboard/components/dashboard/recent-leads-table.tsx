@@ -56,7 +56,9 @@ export function RecentLeadsTable({ leads }: { leads: LeadRow[] }) {
                     </Link>
                     <p className="text-xs text-muted-foreground">{lead.phone}</p>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">{lead.reasonForVisit}</TableCell>
+                  <TableCell className="max-w-xs truncate text-muted-foreground" title={lead.reasonForVisit}>
+                    {lead.reasonForVisit}
+                  </TableCell>
                   <TableCell>
                     <StatusBadge value={lead.urgency} />
                   </TableCell>

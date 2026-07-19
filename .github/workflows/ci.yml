@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      # Placeholders only — the Neon adapter connects lazily, so builds/typecheck
+      # never touch a real DB. Real secrets live in the deploy environment.
+      DATABASE_URL: "postgresql://build:build@localhost:5432/build"
+      JWT_SECRET: "ci-placeholder-secret-not-used-at-runtime-000000000000000000"
+      NEXT_PUBLIC_SITE_URL: "https://www.novadent.co.uk"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build landing
+        run: npm run build:landing
+
+      - name: Build dashboard
+        run: npm run build:dashboard

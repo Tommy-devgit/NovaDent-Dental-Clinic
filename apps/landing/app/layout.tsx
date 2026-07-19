@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 import { AppointmentBookingModal } from "@/components/booking/appointment-booking-modal";
+import { CookieConsent } from "@/components/cookie-consent";
 import { ChatWidget } from "@/components/vapi/chat-widget";
 import { VapiAssistantProvider } from "@/components/vapi/vapi-assistant-provider";
 
@@ -52,6 +53,7 @@ export default function RootLayout({
             {children}
             <ChatWidget />
             <AppointmentBookingModal />
+            <CookieConsent />
           </VapiAssistantProvider>
         </Providers>
       </body>

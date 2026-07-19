@@ -1,6 +1,59 @@
 import { prisma } from "../client";
+import { encryptLeadWrite } from "../lib/pii";
+
+const ACTIVE_APPOINTMENT_STATUSES = ["SCHEDULED", "CONFIRMED", "RESCHEDULED"] as const;
 
 export const appointmentsRepository = {
+  /** Start times of active appointments in [start, end) — used to mask taken slots. */
+  async listActiveBetween(start: Date, end: Date) {
+    const appointments = await prisma.appointment.findMany({
+      where: { scheduledFor: { gte: start, lt: end }, status: { in: ACTIVE_APPOINTMENT_STATUSES as never } },
+      select: { scheduledFor: true },
+    });
+    return appointments.map((appointment) => appointment.scheduledFor);
+  },
+
+  /**
+   * Create a lead + appointment atomically, rejecting a slot already taken by an active
+   * appointment. Throws "SLOT_TAKEN" so the caller can return a friendly 409.
+   */
+  bookAppointment(input: {
+    patientName: string;
+    phone: string;
+    email?: string;
+    reasonForVisit: string;
+    isNewPatient?: boolean;
+    notes?: string;
+    scheduledFor: Date;
+  }) {
+    return prisma.$transaction(async (tx) => {
+      const clash = await tx.appointment.findFirst({
+        where: { scheduledFor: input.scheduledFor, status: { in: ACTIVE_APPOINTMENT_STATUSES as never } },
+        select: { id: true },
+      });
+      if (clash) throw new Error("SLOT_TAKEN");
+
+      const lead = await tx.patientLead.create({
+        data: encryptLeadWrite({
+          patientName: input.patientName,
+          phone: input.phone,
+          email: input.email,
+          reasonForVisit: input.reasonForVisit,
+          isNewPatient: input.isNewPatient,
+          conversationSummary: input.notes,
+          source: "website_booking",
+          appointmentRequestedAt: input.scheduledFor,
+        }),
+      });
+
+      const appointment = await tx.appointment.create({
+        data: { leadId: lead.id, scheduledFor: input.scheduledFor, notes: input.notes },
+      });
+
+      return { leadId: lead.id, appointmentId: appointment.id };
+    });
+  },
+
   listAppointments() {
     return prisma.appointment.findMany({
       include: {

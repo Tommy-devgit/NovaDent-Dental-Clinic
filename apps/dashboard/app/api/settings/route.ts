@@ -4,6 +4,7 @@ import { clinicSettingsRepository } from "@novadent/database";
 import { clinicSettingsUpsertSchema } from "@novadent/validations";
 
 import { getStaffSessionFromCookies } from "@/lib/session";
+import { toApiError } from "@/lib/api-errors";
 
 export async function GET() {
   const settings = await clinicSettingsRepository.getSettings();
@@ -19,9 +20,15 @@ export async function PUT(request: Request) {
   }
 
   const session = await getStaffSessionFromCookies();
-  const settings = await clinicSettingsRepository.upsertSettings({
-    ...parsed.data,
-    updatedByStaffUserId: session?.id,
-  });
+
+  let settings;
+  try {
+    settings = await clinicSettingsRepository.upsertSettings({
+      ...parsed.data,
+      updatedByStaffUserId: session?.id,
+    });
+  } catch (error) {
+    return toApiError(error);
+  }
   return NextResponse.json({ settings });
 }

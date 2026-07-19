@@ -14,7 +14,7 @@ import { Reveal } from "../motion/reveal";
 const CONTACT_DETAILS = [
   { icon: Phone, label: "Phone", value: "+44 7863 789108", href: "tel:+447863789108" },
   { icon: Mail, label: "Email", value: "hello@novadent.com", href: "mailto:hello@novadent.com" },
-  { icon: MapPin, label: "Address", value: "100 Dental Avenue, Suite 200", href: undefined },
+  { icon: MapPin, label: "Address", value: "12 Cavendish Street, Bristol, BS1 4DJ", href: undefined },
   { icon: Clock, label: "Hours", value: "Mon–Fri 8am–6pm, Sat 9am–2pm", href: undefined },
 ];
 

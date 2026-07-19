@@ -7,7 +7,9 @@ import {
   patientLeadsRepository,
 } from "@novadent/database";
 import type { Prisma } from "@novadent/database";
-import { vapiIntakeWebhookSchema } from "@novadent/validations";
+import { normalizeVapiIntake, vapiIntakeWebhookSchema } from "@novadent/validations";
+
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 
 function isAuthorized(request: Request) {
   const expected = process.env.N8N_WEBHOOK_SECRET;
@@ -25,8 +27,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const limit = await rateLimit(`intake:${getClientIp(request)}`, { limit: 120, windowSeconds: 60 });
+  if (!limit.success) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const body = await request.json().catch(() => null);
-  const parsed = vapiIntakeWebhookSchema.safeParse(body);
+  const parsed = vapiIntakeWebhookSchema.safeParse(normalizeVapiIntake(body));
 
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid payload", issues: parsed.error.issues }, { status: 400 });

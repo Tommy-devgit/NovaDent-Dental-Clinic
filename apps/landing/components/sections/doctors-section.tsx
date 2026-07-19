@@ -36,7 +36,7 @@ export function DoctorsSection() {
         <Reveal className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-wide text-primary">Meet Our Doctors</p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            A team you&apos;ll actually recognize at your visit
+            A team you&apos;ll actually recognise at your visit
           </h2>
           <p className="mt-4 text-base leading-7 text-muted-foreground">
             Three licensed dentists, three focus areas, one shared chart — so whoever you see already knows your

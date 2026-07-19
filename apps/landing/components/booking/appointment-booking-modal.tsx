@@ -51,6 +51,36 @@ export function AppointmentBookingModal() {
     defaultValues: DEFAULT_VALUES,
   });
 
+  const [slots, setSlots] = useState<{ time: string; iso: string }[]>([]);
+  const [slotsState, setSlotsState] = useState<"idle" | "loading" | "loaded" | "error">("idle");
+  const preferredDate = form.watch("preferredDate");
+
+  useEffect(() => {
+    if (!preferredDate) {
+      setSlots([]);
+      setSlotsState("idle");
+      return;
+    }
+    let cancelled = false;
+    setSlotsState("loading");
+    form.setValue("preferredTime", "");
+    fetch(`/api/availability?date=${preferredDate}`)
+      .then((response) => (response.ok ? response.json() : Promise.reject(new Error("failed"))))
+      .then((data: { slots: { time: string; iso: string }[] }) => {
+        if (cancelled) return;
+        setSlots(data.slots);
+        setSlotsState("loaded");
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setSlots([]);
+        setSlotsState("error");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [preferredDate, form]);
+
   useEffect(() => {
     function handleOpenRequest(event: Event) {
       const detail = (event as CustomEvent<OpenBookingDetail>).detail;
@@ -101,9 +131,9 @@ export function AppointmentBookingModal() {
             <span className="flex size-12 items-center justify-center rounded-full bg-secondary text-primary">
               <CalendarCheck className="size-6" />
             </span>
-            <DialogTitle>Request received</DialogTitle>
+            <DialogTitle>Appointment booked</DialogTitle>
             <p className="text-sm text-muted-foreground">
-              Thanks — our front desk will reach out shortly to confirm your appointment time.
+              Thanks — your slot is reserved. Our front desk will call to confirm the details.
             </p>
             <Button className="mt-2" onClick={() => setOpen(false)}>
               Done
@@ -166,34 +196,53 @@ export function AppointmentBookingModal() {
                   />
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="preferredDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Preferred date</FormLabel>
-                        <FormControl>
-                          <Input type="date" min={todayIso} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="preferredTime"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Preferred time</FormLabel>
-                        <FormControl>
-                          <Input type="time" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormField
+                  control={form.control}
+                  name="preferredDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Preferred date</FormLabel>
+                      <FormControl>
+                        <Input type="date" min={todayIso} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="preferredTime"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Choose a time</FormLabel>
+                      {!preferredDate ? (
+                        <p className="text-sm text-muted-foreground">Pick a date to see available times.</p>
+                      ) : slotsState === "loading" ? (
+                        <p className="text-sm text-muted-foreground">Loading available times…</p>
+                      ) : slotsState === "error" ? (
+                        <p className="text-sm text-muted-foreground">Couldn&apos;t load times — please try again.</p>
+                      ) : slots.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">No times available on this date — please try another.</p>
+                      ) : (
+                        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                          {slots.map((slot) => (
+                            <Button
+                              key={slot.iso}
+                              type="button"
+                              size="sm"
+                              variant={field.value === slot.time ? "default" : "outline"}
+                              onClick={() => field.onChange(slot.time)}
+                            >
+                              {slot.time}
+                            </Button>
+                          ))}
+                        </div>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
@@ -253,7 +302,7 @@ export function AppointmentBookingModal() {
 
                 <DialogFooter>
                   <Button type="submit" size="lg" className="w-full" disabled={form.formState.isSubmitting}>
-                    {form.formState.isSubmitting ? "Submitting…" : "Request appointment"}
+                    {form.formState.isSubmitting ? "Booking…" : "Book appointment"}
                   </Button>
                 </DialogFooter>
               </form>

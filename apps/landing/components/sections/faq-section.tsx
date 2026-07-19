@@ -26,7 +26,7 @@ const FAQS = [
   {
     question: "Do you accept walk-ins for emergencies?",
     answer:
-      "Emergency cases are prioritized — start a conversation with the AI assistant or call us directly and we'll do our best to fit you in same-day.",
+      "Emergency cases are prioritised — start a conversation with the AI assistant or call us directly and we'll do our best to fit you in same-day.",
   },
   {
     question: "Do you treat children?",

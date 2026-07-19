@@ -27,7 +27,7 @@ const SERVICES = [
   {
     icon: Hammer,
     name: "Fillings",
-    description: "Comfortable, tooth-colored fillings that restore strength without the stares.",
+    description: "Comfortable, tooth-coloured fillings that restore strength without the stares.",
     duration: "30–45 min visit",
     cadence: "Same-week scheduling",
   },

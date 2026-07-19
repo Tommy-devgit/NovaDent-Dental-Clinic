@@ -4,6 +4,7 @@ import { activityLogsRepository, appointmentsRepository } from "@novadent/databa
 import { appointmentRescheduleSchema } from "@novadent/validations";
 
 import { getStaffSessionFromCookies } from "@/lib/session";
+import { toApiError } from "@/lib/api-errors";
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -15,7 +16,13 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 
   const session = await getStaffSessionFromCookies();
-  const appointment = await appointmentsRepository.rescheduleAppointment(id, parsed.data.scheduledFor, session?.id);
+
+  let appointment;
+  try {
+    appointment = await appointmentsRepository.rescheduleAppointment(id, parsed.data.scheduledFor, session?.id);
+  } catch (error) {
+    return toApiError(error);
+  }
 
   await activityLogsRepository
     .logActivity({

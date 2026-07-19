@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import { CONVERSATION_STATUSES, LEAD_URGENCIES, VAPI_PROVIDERS } from "@novadent/utils";
 
+import { emailSchema } from "./email";
+
 // LLM-driven callers (n8n agents, etc.) don't reliably match enum casing exactly even
 // when told to — normalize before validating so "high"/"High"/"HIGH" all work the same.
 function upperCaseEnum<T extends readonly [string, ...string[]]>(values: T) {
@@ -17,7 +19,7 @@ export const vapiIntakeWebhookSchema = z.object({
   durationSeconds: z.coerce.number().int().min(0).optional(),
   patientName: z.string().trim().min(1),
   phone: z.string().trim().min(6),
-  email: z.string().email().optional(),
+  email: emailSchema.optional(),
   reasonForVisit: z.string().trim().min(1),
   symptoms: z.string().trim().optional(),
   urgency: upperCaseEnum(LEAD_URGENCIES).default("LOW"),

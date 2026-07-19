@@ -1,19 +1,16 @@
 import { normalizePagination } from "@novadent/utils";
 
 import { prisma } from "../client";
+import { computeEmailHash, computePhoneHash, decryptLeadRow, encryptLeadWrite } from "../lib/pii";
 
+// PII columns are encrypted, so free-text `contains` search is impossible. Search matches an
+// exact phone or email via their deterministic hash instead (a typed name simply won't match).
 function buildLeadFilters(filters: { q?: string; status?: string; urgency?: string }) {
+  const q = filters.q?.trim();
   return {
     status: filters.status ? (filters.status as never) : undefined,
     urgency: filters.urgency ? (filters.urgency as never) : undefined,
-    OR: filters.q
-      ? [
-          { patientName: { contains: filters.q, mode: "insensitive" as const } },
-          { phone: { contains: filters.q, mode: "insensitive" as const } },
-          { email: { contains: filters.q, mode: "insensitive" as const } },
-          { reasonForVisit: { contains: filters.q, mode: "insensitive" as const } },
-        ]
-      : undefined,
+    OR: q ? [{ phoneHash: computePhoneHash(q) }, { emailHash: computeEmailHash(q) }] : undefined,
   };
 }
 
@@ -70,18 +67,19 @@ export const patientLeadsRepository = {
     };
   },
 
-  listLeadOptions(limit = 100) {
-    return prisma.patientLead.findMany({
+  async listLeadOptions(limit = 100) {
+    const options = await prisma.patientLead.findMany({
       select: { id: true, patientName: true, phone: true },
       orderBy: { createdAt: "desc" },
       take: limit,
     });
+    return options.map((option) => decryptLeadRow(option));
   },
 
-  listLeads(filters: { q?: string; status?: string; urgency?: string; page?: number; pageSize?: number }) {
+  async listLeads(filters: { q?: string; status?: string; urgency?: string; page?: number; pageSize?: number }) {
     const { skip, pageSize } = normalizePagination({ page: filters.page, pageSize: filters.pageSize });
 
-    return prisma.patientLead.findMany({
+    const leads = await prisma.patientLead.findMany({
       where: buildLeadFilters(filters),
       include: {
         assignedStaffUser: true,
@@ -94,18 +92,20 @@ export const patientLeadsRepository = {
       skip,
       take: pageSize,
     });
+    return leads.map((lead) => decryptLeadRow(lead));
   },
 
   countLeads(filters: { q?: string; status?: string; urgency?: string }) {
     return prisma.patientLead.count({ where: buildLeadFilters(filters) });
   },
 
-  findByVapiConversationId(vapiConversationId: string) {
-    return prisma.patientLead.findUnique({ where: { vapiConversationId } });
+  async findByVapiConversationId(vapiConversationId: string) {
+    const lead = await prisma.patientLead.findUnique({ where: { vapiConversationId } });
+    return lead ? decryptLeadRow(lead) : null;
   },
 
-  getLeadById(id: string) {
-    return prisma.patientLead.findUnique({
+  async getLeadById(id: string) {
+    const lead = await prisma.patientLead.findUnique({
       where: { id },
       include: {
         assignedStaffUser: true,
@@ -122,6 +122,7 @@ export const patientLeadsRepository = {
         },
       },
     });
+    return lead ? decryptLeadRow(lead) : null;
   },
 
   createLeadFromBooking(payload: {
@@ -134,7 +135,7 @@ export const patientLeadsRepository = {
     appointmentRequestedAt: Date;
   }) {
     return prisma.patientLead.create({
-      data: {
+      data: encryptLeadWrite({
         patientName: payload.patientName,
         phone: payload.phone,
         email: payload.email,
@@ -143,18 +144,18 @@ export const patientLeadsRepository = {
         conversationSummary: payload.notes,
         source: "website_booking",
         appointmentRequestedAt: payload.appointmentRequestedAt,
-      },
+      }),
     });
   },
 
   updateLeadStatus(id: string, status: string, updatedByStaffUserId?: string, note?: string) {
     return prisma.patientLead.update({
       where: { id },
-      data: {
+      data: encryptLeadWrite({
         status: status as never,
         updatedByStaffUserId,
         conversationSummary: note ? note : undefined,
-      },
+      }),
     });
   },
 
@@ -172,10 +173,11 @@ export const patientLeadsRepository = {
     vapiConversationId: string;
     n8nExecutionId?: string;
     appointmentRequestedAt?: Date;
+    source?: string;
   }) {
     return prisma.patientLead.upsert({
       where: { vapiConversationId: payload.vapiConversationId },
-      create: {
+      create: encryptLeadWrite({
         patientName: payload.patientName,
         phone: payload.phone,
         email: payload.email,
@@ -188,8 +190,9 @@ export const patientLeadsRepository = {
         vapiConversationId: payload.vapiConversationId,
         n8nExecutionId: payload.n8nExecutionId,
         appointmentRequestedAt: payload.appointmentRequestedAt,
-      },
-      update: {
+        source: payload.source,
+      }),
+      update: encryptLeadWrite({
         patientName: payload.patientName,
         phone: payload.phone,
         email: payload.email,
@@ -201,7 +204,7 @@ export const patientLeadsRepository = {
         conversationSummary: payload.summary,
         n8nExecutionId: payload.n8nExecutionId,
         appointmentRequestedAt: payload.appointmentRequestedAt,
-      },
+      }),
     });
   },
 };

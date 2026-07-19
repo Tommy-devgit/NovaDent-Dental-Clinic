@@ -13,7 +13,7 @@ import { openBooking } from "@/lib/booking-events";
 import { HeroAssistantCard } from "../vapi/hero-assistant-card";
 
 const TRUST_INDICATORS = [
-  { icon: ShieldCheck, label: "HIPAA-conscious intake" },
+  { icon: ShieldCheck, label: "UK GDPR compliant" },
   { icon: Stethoscope, label: "Licensed dental team" },
   { icon: CalendarCheck, label: "Same-week availability" },
 ];

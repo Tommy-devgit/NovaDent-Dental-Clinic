@@ -1,4 +1,5 @@
 export { activityLogsRepository } from "./activity-logs";
+export { analyticsRepository } from "./analytics";
 export { appointmentsRepository } from "./appointments";
 export { clinicSettingsRepository } from "./clinic-settings";
 export { conversationLogsRepository } from "./conversation-logs";

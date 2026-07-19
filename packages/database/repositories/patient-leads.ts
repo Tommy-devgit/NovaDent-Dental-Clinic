@@ -172,6 +172,7 @@ export const patientLeadsRepository = {
     vapiConversationId: string;
     n8nExecutionId?: string;
     appointmentRequestedAt?: Date;
+    source?: string;
   }) {
     return prisma.patientLead.upsert({
       where: { vapiConversationId: payload.vapiConversationId },
@@ -188,6 +189,7 @@ export const patientLeadsRepository = {
         vapiConversationId: payload.vapiConversationId,
         n8nExecutionId: payload.n8nExecutionId,
         appointmentRequestedAt: payload.appointmentRequestedAt,
+        source: payload.source,
       },
       update: {
         patientName: payload.patientName,

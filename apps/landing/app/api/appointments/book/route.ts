@@ -35,21 +35,29 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Please choose a date that isn't in the past." }, { status: 400 });
   }
 
-  const lead = await patientLeadsRepository.createLeadFromBooking({
-    patientName: data.patientName,
-    phone: data.phone,
-    email: data.email,
-    reasonForVisit: data.reasonForVisit,
-    isNewPatient: data.isNewPatient,
-    notes: data.notes,
-    appointmentRequestedAt: scheduledFor,
-  });
+  // ponytail: non-atomic (a lead can persist without its appointment). Phase 3 rebuilds
+  // this against real-time availability with a single $transaction + unique-slot constraint.
+  let lead;
+  let appointment;
+  try {
+    lead = await patientLeadsRepository.createLeadFromBooking({
+      patientName: data.patientName,
+      phone: data.phone,
+      email: data.email,
+      reasonForVisit: data.reasonForVisit,
+      isNewPatient: data.isNewPatient,
+      notes: data.notes,
+      appointmentRequestedAt: scheduledFor,
+    });
 
-  const appointment = await appointmentsRepository.createAppointment({
-    leadId: lead.id,
-    scheduledFor,
-    notes: data.notes,
-  });
+    appointment = await appointmentsRepository.createAppointment({
+      leadId: lead.id,
+      scheduledFor,
+      notes: data.notes,
+    });
+  } catch {
+    return NextResponse.json({ error: "We couldn't save your request. Please try again." }, { status: 500 });
+  }
 
   await Promise.all([
     activityLogsRepository.logActivity({

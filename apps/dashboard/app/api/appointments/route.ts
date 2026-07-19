@@ -4,6 +4,7 @@ import { activityLogsRepository, appointmentsRepository } from "@novadent/databa
 import { appointmentUpsertSchema } from "@novadent/validations";
 
 import { getStaffSessionFromCookies } from "@/lib/session";
+import { toApiError } from "@/lib/api-errors";
 
 export async function GET() {
   const appointments = await appointmentsRepository.listAppointments();
@@ -19,10 +20,16 @@ export async function POST(request: Request) {
   }
 
   const session = await getStaffSessionFromCookies();
-  const appointment = await appointmentsRepository.createAppointment({
-    ...parsed.data,
-    createdByStaffUserId: session?.id,
-  });
+
+  let appointment;
+  try {
+    appointment = await appointmentsRepository.createAppointment({
+      ...parsed.data,
+      createdByStaffUserId: session?.id,
+    });
+  } catch (error) {
+    return toApiError(error);
+  }
 
   await activityLogsRepository
     .logActivity({

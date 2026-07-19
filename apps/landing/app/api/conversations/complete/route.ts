@@ -43,6 +43,9 @@ export async function POST(request: Request) {
     reasonForVisit: existingLead?.reasonForVisit ?? firstUserMessage(data.transcript),
     transcript: transcriptText,
     vapiConversationId: data.externalConversationId,
+    // Browser-driven, unauthenticated capture — the authenticated n8n path is the source of
+    // truth. Tag these so staff can distinguish them from verified intake leads.
+    source: existingLead ? undefined : "website_unverified",
   });
 
   const status = data.status ?? "COMPLETED";

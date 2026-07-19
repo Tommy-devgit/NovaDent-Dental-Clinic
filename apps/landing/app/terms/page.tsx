@@ -29,8 +29,8 @@ export default function TermsPage() {
               <h2 className="text-lg font-semibold text-foreground">The AI assistant</h2>
               <p className="mt-2">
                 Our AI assistant helps triage your request and collect information for our clinical team, but does
-                not provide a diagnosis. If you are experiencing a medical emergency, please call your local
-                emergency number or visit the nearest emergency room.
+                not provide a diagnosis. If you are experiencing a medical emergency, please call 999. For urgent
+                non-emergency dental advice, call NHS 111, or attend your nearest A&amp;E.
               </p>
             </section>
 

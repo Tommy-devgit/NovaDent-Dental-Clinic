@@ -30,7 +30,7 @@ const FOOTER_LINKS = [
 const CONTACT_LINES = [
   { icon: Phone, value: "+44 7863 789108", href: "tel:+447863789108" },
   { icon: Mail, value: "hello@novadent.com", href: "mailto:hello@novadent.com" },
-  { icon: MapPin, value: "100 Dental Avenue, Suite 200, Riverside", href: undefined },
+  { icon: MapPin, value: "12 Cavendish Street, Bristol, BS1 4DJ", href: undefined },
   { icon: Clock, value: "Mon–Fri 8am–6pm · Sat 9am–2pm", href: undefined },
 ];
 
@@ -44,9 +44,9 @@ export function SiteFooter() {
               NovaDent
             </Link>
             <p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">
-              A modern dental practice serving Riverside families since 2014. Our AI assistant answers questions,
+              A modern dental practice serving Bristol patients since 2014. Our AI assistant answers questions,
               triages urgency, and books appointments the moment a patient reaches out — day or night — but every
-              treatment plan is reviewed by a licensed dentist.
+              treatment plan is reviewed by a GDC-registered dentist.
             </p>
             <div className="mt-5 space-y-2.5">
               {CONTACT_LINES.map((line) => (
@@ -84,7 +84,7 @@ export function SiteFooter() {
           <p>© {new Date().getFullYear()} NovaDent Dental Care. All rights reserved.</p>
           <p className="flex items-center gap-1.5">
             <ShieldCheck className="size-3.5 text-primary" />
-            Licensed dentists in every state we operate in — patient records handled with HIPAA-conscious care.
+            GDC-registered dentists — patient data handled under UK GDPR and ICO guidelines.
           </p>
         </div>
       </div>

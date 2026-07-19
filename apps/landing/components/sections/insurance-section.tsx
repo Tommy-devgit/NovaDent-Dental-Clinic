@@ -2,22 +2,22 @@ import { Check } from "lucide-react";
 
 import { Card, CardContent } from "@novadent/ui";
 
-const ACCEPTED_PLANS = [
-  "Delta Dental",
-  "Cigna Dental",
-  "MetLife",
-  "Aetna",
-  "Guardian",
-  "United Concordia",
-  "Humana",
-  "Blue Cross Blue Shield Dental",
+const NHS_AND_PLANS = [
+  "NHS dental treatment (Bands 1–3)",
+  "Denplan Essentials",
+  "Denplan Care",
+  "Practice membership plan",
+  "BUPA Dental",
+  "Simplyhealth",
+  "AXA Health",
+  "Vitality Health",
 ];
 
 const PAYMENT_OPTIONS = [
-  "In-network and out-of-network insurance billing handled in-house",
-  "CareCredit and Sunbit financing for larger treatment plans",
-  "HSA and FSA cards accepted at checkout",
-  "Transparent, itemized estimates before any procedure begins",
+  "0% interest-free monthly payment plans available for treatment over £500",
+  "Finance options through our approved credit partner — apply in minutes",
+  "All major debit and credit cards accepted",
+  "We confirm your exact costs in writing before any treatment begins",
 ];
 
 export function InsuranceSection() {
@@ -25,22 +25,22 @@ export function InsuranceSection() {
     <section id="insurance" className="bg-secondary/40 px-6 py-20 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <div className="max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-wide text-primary">Insurance & Payment</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary">NHS & Payment</p>
           <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            Straightforward coverage, no surprise bills
+            NHS, private, and flexible payment options
           </h2>
           <p className="mt-4 text-base leading-7 text-muted-foreground">
-            Mention your insurance provider during intake and our assistant flags it for the front desk, so your
-            benefits are verified before you arrive.
+            We offer both NHS and private dental care. Tell the assistant whether you&apos;re looking for NHS or
+            private treatment and we&apos;ll confirm availability and costs before you arrive.
           </p>
         </div>
 
         <div className="mt-12 grid gap-6 lg:grid-cols-2">
           <Card>
             <CardContent className="p-6">
-              <p className="font-semibold text-foreground">Plans we bill directly</p>
+              <p className="font-semibold text-foreground">NHS &amp; plans we accept</p>
               <ul className="mt-4 grid grid-cols-2 gap-3">
-                {ACCEPTED_PLANS.map((plan) => (
+                {NHS_AND_PLANS.map((plan) => (
                   <li key={plan} className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Check className="size-4 shrink-0 text-primary" />
                     {plan}
@@ -48,14 +48,14 @@ export function InsuranceSection() {
                 ))}
               </ul>
               <p className="mt-4 text-xs leading-5 text-muted-foreground">
-                Not seeing your plan? We still accept most PPO coverage — ask the assistant to confirm.
+                Not on a plan? Private pay is always available — we&apos;ll confirm exact costs before any treatment.
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardContent className="p-6">
-              <p className="font-semibold text-foreground">Ways to pay</p>
+              <p className="font-semibold text-foreground">Ways to spread the cost</p>
               <ul className="mt-4 space-y-3">
                 {PAYMENT_OPTIONS.map((option) => (
                   <li key={option} className="flex items-start gap-2 text-sm leading-6 text-muted-foreground">

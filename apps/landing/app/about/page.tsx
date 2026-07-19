@@ -9,7 +9,7 @@ import { ValuesSection } from "@/components/sections/values-section";
 export const metadata: Metadata = {
   title: "About Us",
   description:
-    "NovaDent is a Riverside dental practice pairing licensed dentists with an AI intake assistant, so care starts the moment you reach out.",
+    "NovaDent is a Bristol dental practice pairing GDC-registered dentists with an AI intake assistant, so care starts the moment you reach out.",
 };
 
 const TIMELINE = [
@@ -52,7 +52,7 @@ export default function AboutPage() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm font-medium text-muted-foreground">
             <span className="flex items-center gap-2">
               <MapPinned className="size-4 text-primary" />
-              Riverside, since 2014
+              Bristol, since 2014
             </span>
             <span className="flex items-center gap-2">
               <GraduationCap className="size-4 text-primary" />3 licensed dentists on staff

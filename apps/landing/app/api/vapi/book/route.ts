@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => null);
-  const { toolCallId, args, callerNumber } = parseVapiToolCall(body);
+  const { toolCallId, args, callerNumber, callId } = parseVapiToolCall(body);
 
   const date = asToolString(args.date);
   const time = asToolString(args.time);
@@ -60,6 +60,9 @@ export async function POST(request: Request) {
       reasonForVisit: data.reasonForVisit,
       isNewPatient: data.isNewPatient,
       scheduledFor,
+      // Stamp the Vapi call id so the end-of-call transcript reconciles to THIS lead
+      // instead of spawning a "Website visitor" placeholder.
+      vapiConversationId: callId,
     });
 
     await Promise.all([

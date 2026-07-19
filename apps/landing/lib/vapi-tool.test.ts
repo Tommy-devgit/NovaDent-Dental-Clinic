@@ -3,16 +3,17 @@ import { describe, expect, it } from "vitest";
 import { formatTime12h, parseVapiToolCall } from "./vapi-tool";
 
 describe("parseVapiToolCall", () => {
-  it("extracts id, object arguments, and inbound caller number", () => {
-    const { toolCallId, args, callerNumber } = parseVapiToolCall({
+  it("extracts id, object arguments, caller number, and call id", () => {
+    const { toolCallId, args, callerNumber, callId } = parseVapiToolCall({
       message: {
         toolCallList: [{ id: "call_1", arguments: { date: "2026-07-22", time: "10:00" } }],
-        call: { customer: { number: "+447519196325" } },
+        call: { id: "vapi_call_1", customer: { number: "+447519196325" } },
       },
     });
     expect(toolCallId).toBe("call_1");
     expect(args.date).toBe("2026-07-22");
     expect(callerNumber).toBe("+447519196325");
+    expect(callId).toBe("vapi_call_1");
   });
 
   it("parses JSON-string arguments", () => {

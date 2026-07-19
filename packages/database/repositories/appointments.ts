@@ -31,6 +31,7 @@ export const appointmentsRepository = {
     isNewPatient?: boolean;
     notes?: string;
     scheduledFor: Date;
+    vapiConversationId?: string;
   }) {
     return prisma.$transaction(async (tx) => {
       const clash = await tx.appointment.findFirst({
@@ -49,6 +50,7 @@ export const appointmentsRepository = {
           conversationSummary: input.notes,
           source: "website_booking",
           appointmentRequestedAt: input.scheduledFor,
+          vapiConversationId: input.vapiConversationId,
         }),
       });
 

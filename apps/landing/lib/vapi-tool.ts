@@ -4,6 +4,7 @@ export interface VapiToolCall {
   toolCallId?: string;
   args: Record<string, unknown>;
   callerNumber?: string;
+  callId?: string;
 }
 
 function asRecord(value: unknown): Record<string, unknown> | undefined {
@@ -26,6 +27,7 @@ export function parseVapiToolCall(body: unknown): VapiToolCall {
   const call = asRecord(message?.call);
   const customer = asRecord(call?.customer);
   const callerNumber = typeof customer?.number === "string" ? customer.number : undefined;
+  const callId = typeof call?.id === "string" ? call.id : undefined;
 
   const list = message?.toolCallList;
   if (Array.isArray(list)) {
@@ -43,10 +45,10 @@ export function parseVapiToolCall(body: unknown): VapiToolCall {
       } else {
         args = asRecord(rawArgs) ?? {};
       }
-      return { toolCallId: typeof rec.id === "string" ? rec.id : undefined, args, callerNumber };
+      return { toolCallId: typeof rec.id === "string" ? rec.id : undefined, args, callerNumber, callId };
     }
   }
-  return { args: {}, callerNumber };
+  return { args: {}, callerNumber, callId };
 }
 
 /** Vapi requires the tool-call id echoed in a {results:[…]} envelope, else it logs no result. */

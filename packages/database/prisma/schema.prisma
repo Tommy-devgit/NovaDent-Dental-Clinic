@@ -92,7 +92,9 @@ model PatientLead {
   id                     String            @id @default(cuid())
   patientName            String
   phone                  String
+  phoneHash              String?
   email                  String?
+  emailHash              String?
   reasonForVisit         String
   symptoms               String?
   isNewPatient           Boolean?
@@ -117,8 +119,8 @@ model PatientLead {
   @@map("patient_leads")
   @@index([status])
   @@index([urgency])
-  @@index([phone])
-  @@index([email])
+  @@index([phoneHash])
+  @@index([emailHash])
   @@index([createdAt])
 }
 

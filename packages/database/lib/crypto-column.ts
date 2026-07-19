@@ -27,6 +27,9 @@ export function encryptField(plaintext: string): string {
 /** Reverse of encryptField. Throws if the auth tag fails (tampered data). */
 export function decryptField(token: string): string {
   const buffer = Buffer.from(token, "base64");
+  if (buffer.length < IV_BYTES + AUTH_TAG_BYTES + 1) {
+    throw new Error("Ciphertext too short to be valid");
+  }
   const iv = buffer.subarray(0, IV_BYTES);
   const authTag = buffer.subarray(IV_BYTES, IV_BYTES + AUTH_TAG_BYTES);
   const ciphertext = buffer.subarray(IV_BYTES + AUTH_TAG_BYTES);

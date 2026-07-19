@@ -2,25 +2,29 @@ import { normalizePagination } from "@novadent/utils";
 
 import { prisma } from "../client";
 import { Prisma } from "../generated/client";
+import { decryptConversationRow, decryptLeadRow, encryptConversationWrite } from "../lib/pii";
 
+// summary/transcript and the joined lead's name are encrypted, so `contains` search is not
+// possible here — only the status filter is applied server-side.
 function buildConversationFilters(filters: { q?: string; status?: string }) {
   return {
     status: filters.status ? (filters.status as never) : undefined,
-    OR: filters.q
-      ? [
-          { summary: { contains: filters.q, mode: "insensitive" as const } },
-          { transcript: { contains: filters.q, mode: "insensitive" as const } },
-          { lead: { patientName: { contains: filters.q, mode: "insensitive" as const } } },
-        ]
-      : undefined,
   };
 }
 
+function decryptConversationWithLead<T extends Record<string, unknown>>(row: T): T {
+  const decrypted = decryptConversationRow(row);
+  if (decrypted.lead && typeof decrypted.lead === "object") {
+    return { ...decrypted, lead: decryptLeadRow(decrypted.lead as Record<string, unknown>) };
+  }
+  return decrypted;
+}
+
 export const conversationLogsRepository = {
-  listConversations(filters: { q?: string; status?: string; page?: number; pageSize?: number } = {}) {
+  async listConversations(filters: { q?: string; status?: string; page?: number; pageSize?: number } = {}) {
     const { skip, pageSize } = normalizePagination({ page: filters.page, pageSize: filters.pageSize });
 
-    return prisma.conversationLog.findMany({
+    const conversations = await prisma.conversationLog.findMany({
       where: buildConversationFilters(filters),
       include: {
         lead: true,
@@ -29,14 +33,15 @@ export const conversationLogsRepository = {
       skip,
       take: pageSize,
     });
+    return conversations.map((conversation) => decryptConversationWithLead(conversation));
   },
 
   countConversations(filters: { q?: string; status?: string } = {}) {
     return prisma.conversationLog.count({ where: buildConversationFilters(filters) });
   },
 
-  getConversationById(id: string) {
-    return prisma.conversationLog.findUnique({
+  async getConversationById(id: string) {
+    const conversation = await prisma.conversationLog.findUnique({
       where: { id },
       include: {
         lead: true,
@@ -45,19 +50,22 @@ export const conversationLogsRepository = {
         },
       },
     });
+    return conversation ? decryptConversationWithLead(conversation) : null;
   },
 
-  getConversationByLeadId(leadId: string) {
-    return prisma.conversationLog.findMany({
+  async getConversationByLeadId(leadId: string) {
+    const conversations = await prisma.conversationLog.findMany({
       where: { leadId },
       orderBy: { createdAt: "desc" },
     });
+    return conversations.map((conversation) => decryptConversationRow(conversation));
   },
 
-  findByExternalConversationId(externalConversationId: string) {
-    return prisma.conversationLog.findUnique({
+  async findByExternalConversationId(externalConversationId: string) {
+    const conversation = await prisma.conversationLog.findUnique({
       where: { externalConversationId },
     });
+    return conversation ? decryptConversationRow(conversation) : null;
   },
 
   createConversationLog(input: {
@@ -75,7 +83,7 @@ export const conversationLogsRepository = {
     endedAt?: Date;
   }) {
     return prisma.conversationLog.create({
-      data: {
+      data: encryptConversationWrite({
         leadId: input.leadId,
         provider: input.provider as never,
         externalConversationId: input.externalConversationId,
@@ -88,7 +96,7 @@ export const conversationLogsRepository = {
         metadata: input.metadata,
         startedAt: input.startedAt,
         endedAt: input.endedAt,
-      },
+      }),
     });
   },
 
@@ -108,7 +116,7 @@ export const conversationLogsRepository = {
   }) {
     return prisma.conversationLog.upsert({
       where: { externalConversationId: input.externalConversationId },
-      create: {
+      create: encryptConversationWrite({
         leadId: input.leadId,
         provider: input.provider as never,
         externalConversationId: input.externalConversationId,
@@ -121,8 +129,8 @@ export const conversationLogsRepository = {
         metadata: input.metadata,
         startedAt: input.startedAt,
         endedAt: input.endedAt,
-      },
-      update: {
+      }),
+      update: encryptConversationWrite({
         assistantId: input.assistantId,
         status: (input.status as never) ?? undefined,
         durationSeconds: input.durationSeconds,
@@ -132,14 +140,14 @@ export const conversationLogsRepository = {
         metadata: input.metadata,
         startedAt: input.startedAt,
         endedAt: input.endedAt,
-      },
+      }),
     });
   },
 
   setRecordingUrl(externalConversationId: string, recordingUrl: string) {
     return prisma.conversationLog.update({
       where: { externalConversationId },
-      data: { recordingUrl },
+      data: encryptConversationWrite({ recordingUrl }),
     });
   },
 };

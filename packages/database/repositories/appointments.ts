@@ -1,3 +1,5 @@
+import { normalizePagination } from "@novadent/utils";
+
 import { prisma } from "../client";
 import { decryptLeadRow, encryptLeadWrite } from "../lib/pii";
 
@@ -68,6 +70,25 @@ export const appointmentsRepository = {
       orderBy: { scheduledFor: "asc" },
     });
     return rows.map(decryptApptLead);
+  },
+
+  async listAppointmentsPage(filters: { page?: number; pageSize?: number }) {
+    const { skip, pageSize } = normalizePagination({ page: filters.page, pageSize: filters.pageSize });
+    const rows = await prisma.appointment.findMany({
+      include: {
+        lead: true,
+        createdByStaffUser: true,
+        updatedByStaffUser: true,
+      },
+      orderBy: { scheduledFor: "asc" },
+      skip,
+      take: pageSize,
+    });
+    return rows.map(decryptApptLead);
+  },
+
+  countAppointments() {
+    return prisma.appointment.count();
   },
 
   async listUpcomingAppointments(limit = 5) {

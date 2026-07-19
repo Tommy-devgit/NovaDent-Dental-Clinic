@@ -2,23 +2,32 @@ export const dynamic = "force-dynamic";
 
 import { notFound } from "next/navigation";
 
-import { activityLogsRepository, patientLeadsRepository } from "@novadent/database";
+import { activityLogsRepository, patientLeadsRepository, staffUsersRepository } from "@novadent/database";
 import { Card, CardContent, CardHeader, CardTitle, PageHeader, StatusBadge } from "@novadent/ui";
 
+import { DsarDownloadButton } from "@/components/dashboard/dsar-download-button";
+import { LeadAssignSelect } from "@/components/dashboard/lead-assign-select";
+import { LeadEditDialog } from "@/components/dashboard/lead-edit-dialog";
+import { LeadEraseButton } from "@/components/dashboard/lead-erase-button";
 import { LeadStatusActions } from "@/components/dashboard/lead-status-actions";
 import type { TimelineEvent } from "@/components/dashboard/lead-timeline";
 import { LeadTimeline } from "@/components/dashboard/lead-timeline";
+import { getStaffSessionFromCookies } from "@/lib/session";
 
 export default async function LeadDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [lead, activity] = await Promise.all([
+  const [lead, activity, staff, session] = await Promise.all([
     patientLeadsRepository.getLeadById(id),
     activityLogsRepository.listActivityForResource("PatientLead", id),
+    staffUsersRepository.listActiveStaff(),
+    getStaffSessionFromCookies(),
   ]);
 
   if (!lead) {
     notFound();
   }
+
+  const isAdmin = session?.role === "ADMIN";
 
   const timelineEvents: TimelineEvent[] = [
     { id: `lead-${lead.id}`, type: "lead-created", label: `Lead created via ${lead.source}`, timestamp: lead.createdAt },
@@ -55,6 +64,25 @@ export default async function LeadDetailsPage({ params }: { params: Promise<{ id
           <>
             <StatusBadge value={lead.urgency} />
             <StatusBadge value={lead.status} />
+            <DsarDownloadButton
+              filename={`patient-${lead.id}.json`}
+              data={JSON.stringify(lead, null, 2)}
+            />
+            {isAdmin ? (
+              <>
+                <LeadEditDialog
+                  leadId={lead.id}
+                  defaultValues={{
+                    patientName: lead.patientName,
+                    phone: lead.phone,
+                    email: lead.email ?? null,
+                    reasonForVisit: lead.reasonForVisit,
+                    urgency: lead.urgency,
+                  }}
+                />
+                <LeadEraseButton leadId={lead.id} patientName={lead.patientName} />
+              </>
+            ) : null}
           </>
         }
       />
@@ -126,6 +154,18 @@ export default async function LeadDetailsPage({ params }: { params: Promise<{ id
         </div>
 
         <aside className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Assignee</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <LeadAssignSelect
+                leadId={lead.id}
+                currentAssigneeId={lead.assignedStaffUserId ?? null}
+                staff={staff}
+              />
+            </CardContent>
+          </Card>
           <LeadStatusActions leadId={lead.id} currentStatus={lead.status} />
           <LeadTimeline events={timelineEvents} />
         </aside>

@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { emailSchema } from "./email";
 import { normalizeUkPhone } from "./phone";
 
 export const publicAppointmentBookingSchema = z.object({
@@ -12,7 +13,7 @@ export const publicAppointmentBookingSchema = z.object({
     }
     return normalized;
   }),
-  email: z.preprocess((value) => (value === "" ? undefined : value), z.string().email().optional()),
+  email: z.preprocess((value) => (value === "" ? undefined : value), emailSchema.optional()),
   preferredDate: z.string().min(1, "Preferred date is required"),
   preferredTime: z.string().min(1, "Preferred time is required"),
   reasonForVisit: z.string().trim().min(1, "Reason for visit is required"),

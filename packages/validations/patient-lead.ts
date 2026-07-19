@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import { LEAD_STATUSES, LEAD_URGENCIES } from "@novadent/utils";
 
+import { emailSchema } from "./email";
+
 export const patientLeadFiltersSchema = z.object({
   q: z.string().trim().optional(),
   status: z.enum(LEAD_STATUSES).optional(),
@@ -18,7 +20,7 @@ export const patientLeadStatusUpdateSchema = z.object({
 export const patientLeadUpsertSchema = z.object({
   patientName: z.string().trim().min(1),
   phone: z.string().trim().min(6),
-  email: z.string().email().optional(),
+  email: emailSchema.optional(),
   reasonForVisit: z.string().trim().min(1),
   symptoms: z.string().trim().optional(),
   urgency: z.enum(LEAD_URGENCIES).default("LOW"),

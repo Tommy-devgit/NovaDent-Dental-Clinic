@@ -3,6 +3,7 @@ export * from "./appointment-booking";
 export * from "./assistant-chat";
 export * from "./auth";
 export * from "./clinic-setting";
+export * from "./email";
 export * from "./conversation-completion";
 export * from "./conversation-log";
 export * from "./patient-lead";

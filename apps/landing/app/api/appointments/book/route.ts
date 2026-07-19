@@ -4,6 +4,7 @@ import { activityLogsRepository, appointmentsRepository, patientLeadsRepository 
 import { publicAppointmentBookingSchema } from "@novadent/validations";
 
 import { getClientIp, rateLimit } from "@/lib/rate-limit";
+import { parseLondonDateTime } from "@/lib/datetime";
 
 export async function POST(request: Request) {
   const limit = await rateLimit(`book:${getClientIp(request)}`, { limit: 5, windowSeconds: 60 });
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
   }
 
   const data = parsed.data;
-  const scheduledFor = new Date(`${data.preferredDate}T${data.preferredTime}`);
+  const scheduledFor = parseLondonDateTime(data.preferredDate, data.preferredTime);
 
   if (Number.isNaN(scheduledFor.getTime())) {
     return NextResponse.json({ error: "That date or time doesn't look right — please double check it." }, { status: 400 });

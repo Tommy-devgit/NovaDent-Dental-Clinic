@@ -1,35 +1,7 @@
-import {
-  CalendarPlus,
-  CalendarClock,
-  MessageCircle,
-  PhoneOff,
-  RefreshCw,
-  UserPlus,
-  type LucideIcon,
-} from "lucide-react";
-
 import { Card, CardContent, CardHeader, CardTitle, EmptyState } from "@novadent/ui";
 import type { ActivityAction } from "@novadent/types";
 
-const ACTION_ICON: Record<ActivityAction, LucideIcon> = {
-  LEAD_CREATED: UserPlus,
-  LEAD_UPDATED: RefreshCw,
-  CONVERSATION_STARTED: MessageCircle,
-  CONVERSATION_ENDED: PhoneOff,
-  APPOINTMENT_CREATED: CalendarPlus,
-  APPOINTMENT_UPDATED: CalendarClock,
-  STATUS_CHANGED: RefreshCw,
-};
-
-const ACTION_LABEL: Record<ActivityAction, string> = {
-  LEAD_CREATED: "New lead created",
-  LEAD_UPDATED: "Lead updated",
-  CONVERSATION_STARTED: "Conversation started",
-  CONVERSATION_ENDED: "Conversation ended",
-  APPOINTMENT_CREATED: "Appointment created",
-  APPOINTMENT_UPDATED: "Appointment updated",
-  STATUS_CHANGED: "Status changed",
-};
+import { ACTIVITY_ICON as ACTION_ICON, ACTIVITY_LABEL as ACTION_LABEL } from "@/lib/activity-meta";
 
 type ActivityEntry = {
   id: string;

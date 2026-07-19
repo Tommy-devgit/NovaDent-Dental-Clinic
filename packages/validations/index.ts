@@ -8,5 +8,6 @@ export * from "./conversation-completion";
 export * from "./conversation-log";
 export * from "./patient-lead";
 export * from "./phone";
+export * from "./staff";
 export * from "./vapi";
 export * from "./vapi-intake";

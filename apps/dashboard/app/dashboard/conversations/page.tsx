@@ -18,6 +18,8 @@ import {
 import { conversationFiltersSchema } from "@novadent/validations";
 
 import { ConversationsFilterBar } from "@/components/dashboard/conversations-filter-bar";
+import { ExportCsvButton } from "@/components/dashboard/export-csv-button";
+import { getStaffSessionFromCookies } from "@/lib/session";
 
 function formatDuration(seconds: number | null | undefined) {
   if (!seconds) return "—";
@@ -39,9 +41,10 @@ export default async function ConversationsPage({
     pageSize: resolvedSearchParams.pageSize,
   });
 
-  const [conversations, totalItems] = await Promise.all([
+  const [conversations, totalItems, session] = await Promise.all([
     conversationLogsRepository.listConversations(filters),
     conversationLogsRepository.countConversations(filters),
+    getStaffSessionFromCookies(),
   ]);
 
   function buildHref(page: number) {
@@ -52,9 +55,17 @@ export default async function ConversationsPage({
     return `/dashboard/conversations?${params.toString()}`;
   }
 
+  const exportParams = new URLSearchParams();
+  if (filters.status) exportParams.set("status", filters.status);
+  const exportHref = `/api/export/conversations?${exportParams.toString()}`;
+
   return (
     <div className="space-y-6">
-      <PageHeader title="Conversations" description="Voice calls and transcript logs generated through Vapi." />
+      <PageHeader
+        title="Conversations"
+        description="Voice calls and transcript logs generated through Vapi."
+        actions={session?.role === "ADMIN" ? <ExportCsvButton href={exportHref} /> : undefined}
+      />
 
       <ConversationsFilterBar />
 

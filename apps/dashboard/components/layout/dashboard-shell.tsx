@@ -1,13 +1,16 @@
 "use client";
 
 import {
+  BarChart3,
   CalendarCheck2,
   LayoutDashboard,
   LogOut,
   MessagesSquare,
   Menu,
+  ScrollText,
   Settings,
   Stethoscope,
+  UserCog,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -39,6 +42,9 @@ const NAV_ITEMS = [
   { href: "/dashboard/leads", label: "Leads", icon: Users, adminOnly: false },
   { href: "/dashboard/appointments", label: "Appointments", icon: CalendarCheck2, adminOnly: false },
   { href: "/dashboard/conversations", label: "Conversations", icon: MessagesSquare, adminOnly: false },
+  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3, adminOnly: false },
+  { href: "/dashboard/staff", label: "Staff", icon: UserCog, adminOnly: true },
+  { href: "/dashboard/activity", label: "Audit log", icon: ScrollText, adminOnly: true },
   { href: "/dashboard/settings", label: "Settings", icon: Settings, adminOnly: true },
 ];
 

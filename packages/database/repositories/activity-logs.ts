@@ -1,5 +1,15 @@
+import { normalizePagination } from "@novadent/utils";
+
 import { prisma } from "../client";
 import { Prisma } from "../generated/client";
+
+function buildActivityFilters(filters: { action?: string; resourceType?: string; staffUserId?: string }) {
+  return {
+    action: filters.action ? (filters.action as never) : undefined,
+    resourceType: filters.resourceType || undefined,
+    staffUserId: filters.staffUserId || undefined,
+  };
+}
 
 export const activityLogsRepository = {
   logActivity(input: {
@@ -34,5 +44,26 @@ export const activityLogsRepository = {
       orderBy: { createdAt: "desc" },
       take: limit,
     });
+  },
+
+  listActivity(filters: {
+    action?: string;
+    resourceType?: string;
+    staffUserId?: string;
+    page?: number;
+    pageSize?: number;
+  }) {
+    const { skip, pageSize } = normalizePagination({ page: filters.page, pageSize: filters.pageSize });
+    return prisma.activityLog.findMany({
+      where: buildActivityFilters(filters),
+      include: { staffUser: true },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: pageSize,
+    });
+  },
+
+  countActivity(filters: { action?: string; resourceType?: string; staffUserId?: string }) {
+    return prisma.activityLog.count({ where: buildActivityFilters(filters) });
   },
 };

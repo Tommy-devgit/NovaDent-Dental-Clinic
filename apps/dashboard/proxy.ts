@@ -2,7 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { STAFF_SESSION_COOKIE, getStaffSessionFromToken } from "./lib/session";
 
-const ADMIN_ONLY_PATHS = ["/dashboard/settings", "/api/settings"];
+const ADMIN_ONLY_PATHS = [
+  "/dashboard/settings",
+  "/api/settings",
+  "/dashboard/staff",
+  "/api/staff",
+  "/dashboard/activity",
+  "/api/activity",
+  "/api/export",
+];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

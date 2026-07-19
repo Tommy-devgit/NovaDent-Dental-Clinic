@@ -7,3 +7,4 @@ export * from "./conversation-completion";
 export * from "./conversation-log";
 export * from "./patient-lead";
 export * from "./vapi";
+export * from "./vapi-intake";

@@ -7,7 +7,7 @@ import {
   patientLeadsRepository,
 } from "@novadent/database";
 import type { Prisma } from "@novadent/database";
-import { vapiIntakeWebhookSchema } from "@novadent/validations";
+import { normalizeVapiIntake, vapiIntakeWebhookSchema } from "@novadent/validations";
 
 function isAuthorized(request: Request) {
   const expected = process.env.N8N_WEBHOOK_SECRET;
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => null);
-  const parsed = vapiIntakeWebhookSchema.safeParse(body);
+  const parsed = vapiIntakeWebhookSchema.safeParse(normalizeVapiIntake(body));
 
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid payload", issues: parsed.error.issues }, { status: 400 });

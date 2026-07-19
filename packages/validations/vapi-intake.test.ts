@@ -54,6 +54,27 @@ describe("normalizeVapiIntake", () => {
     expect(parsed.data.metadata?.callbackConsent).toBe(true);
   });
 
+  it("falls back to the inbound caller number when the tool omits patient.phone", () => {
+    const noPhone = {
+      message: {
+        toolCallList: [
+          {
+            id: "t",
+            arguments: {
+              patient: { fullName: "Mahbhir Mahnud", email: "m@icloud.com", isNewPatient: true },
+              request: { urgency: "routine", reasonForVisit: "Routine checkup" },
+              conversationSummary: "New patient, routine checkup.",
+            },
+          },
+        ],
+        call: { id: "call_inbound", customer: { number: "+447519196325" } },
+      },
+    };
+    const parsed = vapiIntakeWebhookSchema.safeParse(normalizeVapiIntake(noPhone));
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.phone).toBe("+447519196325");
+  });
+
   it("falls back to the summary for transcript when no artifact messages exist", () => {
     const noMessages = { message: { toolCallList: [{ id: "t", arguments: toolArguments }], call: { id: "c1" } } };
     const parsed = vapiIntakeWebhookSchema.safeParse(normalizeVapiIntake(noMessages));

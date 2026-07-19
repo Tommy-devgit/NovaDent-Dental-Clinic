@@ -50,14 +50,17 @@ function buildMetadata(args: Record<string, unknown>, patient: Record<string, un
   return Object.keys(metadata).length > 0 ? metadata : undefined;
 }
 
-function buildFlat(args: Record<string, unknown>, context: { externalConversationId?: string; transcript?: string }) {
+function buildFlat(
+  args: Record<string, unknown>,
+  context: { externalConversationId?: string; transcript?: string; callerNumber?: string },
+) {
   const patient = isRecord(args.patient) ? args.patient : {};
   const request = isRecord(args.request) ? args.request : {};
   const summary = asString(args.conversationSummary);
   return {
     externalConversationId: context.externalConversationId,
     patientName: patient.fullName,
-    phone: patient.phone,
+    phone: asString(patient.phone) ?? context.callerNumber,
     email: patient.email,
     reasonForVisit: request.reasonForVisit,
     symptoms: request.symptoms,
@@ -83,9 +86,11 @@ export function normalizeVapiIntake(raw: unknown): unknown {
   if (isRecord(message) && Array.isArray(message.toolCallList)) {
     const toolCall = message.toolCallList.find((call) => isRecord(call) && isRecord(call.arguments));
     const args = isRecord(toolCall) && isRecord(toolCall.arguments) ? toolCall.arguments : {};
+    const call = isRecord(message.call) ? message.call : undefined;
     return buildFlat(args, {
-      externalConversationId: isRecord(message.call) ? asString(message.call.id) : undefined,
+      externalConversationId: call ? asString(call.id) : undefined,
       transcript: extractTranscript(message.artifact),
+      callerNumber: call && isRecord(call.customer) ? asString(call.customer.number) : undefined,
     });
   }
 

@@ -11,6 +11,14 @@
     "build:landing": "npm run build --workspace=@novadent/landing",
     "build:dashboard": "npm run build --workspace=@novadent/dashboard",
     "db:generate": "npm run generate --workspace=@novadent/database",
-    "db:seed": "npm run db:seed --workspace=@novadent/database"
+    "db:seed": "npm run db:seed --workspace=@novadent/database",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit -p apps/landing && tsc --noEmit -p apps/dashboard"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.2.7",
+    "vitest": "^3.2.7"
   }
 }

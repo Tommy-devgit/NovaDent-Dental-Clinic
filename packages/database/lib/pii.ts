@@ -25,13 +25,26 @@ function encryptValue(value: unknown): unknown {
   return typeof value === "string" && value.length > 0 ? encryptField(value) : value;
 }
 
-// Tolerant: legacy plaintext (or already-decrypted) values that aren't valid ciphertext
-// pass through unchanged instead of throwing, so reads survive a partial backfill.
+const MIN_CIPHERTEXT_BYTES = 29; // 12-byte IV + 16-byte auth tag + at least 1 payload byte
+
+function isCiphertextShaped(value: string): boolean {
+  if (value.length % 4 !== 0 || !/^[A-Za-z0-9+/]+={0,2}$/.test(value)) return false;
+  return Buffer.from(value, "base64").length >= MIN_CIPHERTEXT_BYTES;
+}
+
+// Tolerant only for legacy plaintext (partial backfill): non-base64 values pass through.
+// A ciphertext-shaped value that fails to decrypt means PII_ENCRYPTION_KEY doesn't match
+// the key that encrypted the row — throw instead of leaking ciphertext to the UI.
 function decryptValue(value: unknown): unknown {
   if (typeof value !== "string" || value.length === 0) return value;
   try {
     return decryptField(value);
   } catch {
+    if (isCiphertextShaped(value)) {
+      throw new Error(
+        "Failed to decrypt PII column: PII_ENCRYPTION_KEY does not match the key that encrypted this row",
+      );
+    }
     return value;
   }
 }

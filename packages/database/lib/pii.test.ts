@@ -39,6 +39,15 @@ describe("decryptLeadRow round-trip", () => {
     expect(decrypted?.phone).toBe("07123456789");
   });
 
+  it("throws on ciphertext that fails to decrypt (wrong key) instead of returning the blob", () => {
+    const token = pii.encryptLeadWrite({ patientName: "Jane Smith" }).patientName as string;
+    const corrupted = Buffer.from(token, "base64");
+    corrupted[corrupted.length - 1] ^= 0xff;
+    expect(() => pii.decryptLeadRow({ patientName: corrupted.toString("base64") })).toThrow(
+      /PII_ENCRYPTION_KEY does not match/,
+    );
+  });
+
   it("decrypts nested conversationLogs", () => {
     const row = { patientName: pii.encryptLeadWrite({ patientName: "X" }).patientName, conversationLogs: [pii.encryptConversationWrite({ transcript: "secret call" })] };
     const decrypted = pii.decryptLeadRow(row) as { conversationLogs: { transcript: string }[] };

@@ -3,7 +3,7 @@ import { createCipheriv, createDecipheriv, createHmac, randomBytes } from "node:
 const IV_BYTES = 12;
 const AUTH_TAG_BYTES = 16;
 
-function getKey(): Buffer {
+function loadKey(): Buffer {
   const raw = process.env.PII_ENCRYPTION_KEY;
   if (!raw) {
     throw new Error("Missing PII_ENCRYPTION_KEY environment variable");
@@ -15,10 +15,14 @@ function getKey(): Buffer {
   return key;
 }
 
+// Validated at module load so a missing/malformed key fails the boot (and build),
+// instead of surfacing later as undecryptable PII in the UI.
+const KEY = loadKey();
+
 /** AES-256-GCM encrypt. Returns base64(iv | authTag | ciphertext). */
 export function encryptField(plaintext: string): string {
   const iv = randomBytes(IV_BYTES);
-  const cipher = createCipheriv("aes-256-gcm", getKey(), iv);
+  const cipher = createCipheriv("aes-256-gcm", KEY, iv);
   const ciphertext = Buffer.concat([cipher.update(plaintext, "utf8"), cipher.final()]);
   const authTag = cipher.getAuthTag();
   return Buffer.concat([iv, authTag, ciphertext]).toString("base64");
@@ -33,7 +37,7 @@ export function decryptField(token: string): string {
   const iv = buffer.subarray(0, IV_BYTES);
   const authTag = buffer.subarray(IV_BYTES, IV_BYTES + AUTH_TAG_BYTES);
   const ciphertext = buffer.subarray(IV_BYTES + AUTH_TAG_BYTES);
-  const decipher = createDecipheriv("aes-256-gcm", getKey(), iv);
+  const decipher = createDecipheriv("aes-256-gcm", KEY, iv);
   decipher.setAuthTag(authTag);
   return decipher.update(ciphertext, undefined, "utf8") + decipher.final("utf8");
 }
@@ -44,5 +48,5 @@ export function decryptField(token: string): string {
  */
 export function hashForSearch(value: string): string {
   const normalized = value.trim().toLowerCase();
-  return createHmac("sha256", getKey()).update(normalized).digest("hex");
+  return createHmac("sha256", KEY).update(normalized).digest("hex");
 }

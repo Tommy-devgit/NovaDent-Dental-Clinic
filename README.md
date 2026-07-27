@@ -43,7 +43,7 @@ npm run db:seed                                     # creates the first ADMIN us
 
 ```bash
 npm run dev:landing      # http://localhost:3000
-npm run dev:dashboard    # http://localhost:3000 (run on a different port if both are up)
+npm run dev:dashboard    # http://localhost:3000 (Run on a different port if both are up)
 ```
 
 ## Automation
